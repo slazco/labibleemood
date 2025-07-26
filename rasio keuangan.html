@@ -54,7 +54,6 @@
             font-size: 1rem;
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            /* min-width: 180px; - Removed for more responsiveness */
             flex: 1 1 auto; /* Allows buttons to grow and shrink */
             max-width: 100%; /* Prevents buttons from becoming too wide on large screens */
         }
@@ -347,25 +346,28 @@
 
     // Pemetaan bulan ke angka untuk pengurutan
     const MONTH_ORDER = {
-        'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'Mei': 5, 'Jun': 6,
-        'Jul': 7, 'Agu': 8, 'Sep': 9, 'Okt': 10, 'Nov': 11, 'Des': 12
+        'Januari': 1, 'Februari': 2, 'Maret': 3, 'April': 4, 'Mei': 5, 'Juni': 6,
+        'Juli': 7, 'Agustus': 8, 'September': 9, 'Oktober': 10, 'November': 11, 'Desember': 12
     };
-    const REVERSE_MONTH_ORDER = Object.fromEntries(Object.entries(MONTH_ORDER).map(([k, v]) => [v, k]));
+    const REVERSE_MONTH_ORDER = {
+        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
+        7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
+    };
 
-    // Pemetaan input pengguna ke nama bulan kanonik 3 huruf kapital
+    // Pemetaan input pengguna ke nama bulan kanonik penuh
     const MONTH_INPUT_NORMALIZER = {
-        'jan': 'Jan', 'januari': 'Jan',
-        'feb': 'Feb', 'februari': 'Feb',
-        'mar': 'Mar', 'maret': 'Mar',
-        'apr': 'Apr', 'april': 'Apr',
+        'jan': 'Januari', 'januari': 'Januari',
+        'feb': 'Februari', 'februari': 'Februari',
+        'mar': 'Maret', 'maret': 'Maret',
+        'apr': 'April', 'april': 'April',
         'mei': 'Mei',
-        'jun': 'Jun', 'juni': 'Jun',
-        'jul': 'Jul', 'juli': 'Jul',
-        'agu': 'Agu', 'agustus': 'Agu',
-        'sep': 'Sep', 'september': 'Sep',
-        'okt': 'Okt', 'oktober': 'Okt',
-        'nov': 'Nov', 'november': 'Nov',
-        'des': 'Des', 'desember': 'Des'
+        'jun': 'Juni', 'juni': 'Juni',
+        'jul': 'Juli', 'juli': 'Juli',
+        'agu': 'Agustus', 'agustus': 'Agustus',
+        'sep': 'September', 'september': 'September',
+        'okt': 'Oktober', 'oktober': 'Oktober',
+        'nov': 'November', 'november': 'November',
+        'des': 'Desember', 'desember': 'Desember'
     };
 
     // --- UTILITY FUNCTIONS ---
@@ -483,7 +485,7 @@
 
             if (!detectedMonth) {
                 logToConsole(`Peringatan: Bulan tidak terdeteksi otomatis dari nama file: ${file.name}.`, 'warning');
-                const userInput = prompt(`Masukkan bulan untuk ${file.name} (misal: Jan, Februari, dll.):`);
+                const userInput = prompt(`Masukkan bulan untuk ${file.name} (misal: Januari, Februari, dll.):`);
                 month = normalizeMonthInput(userInput);
                 if (!month) {
                     logToConsole(`Bulan tidak valid untuk ${file.name}. File ini dilewati.`, 'error');
@@ -560,7 +562,37 @@
                         loadedSheets['Income']._incomeColName = actualHeaders.find(h => h.toLowerCase() === 'total penghasilan') || 'Total Penghasilan';
 
                     } else {
-                        // ... (kode fallback prompt manual tetap sama)
+                        logToConsole(`Peringatan: Baris header 'Total Penghasilan' tidak ditemukan di sheet 'Income' dari ${file.name}. Mencoba mengasumsikan kolom standar.`, 'warning');
+                        // Fallback jika header tidak ditemukan otomatis
+                        const columns = rawData[0] || []; // Mengambil baris pertama sebagai calon header
+                        const commonIncomeCols = [
+                            "Total Penghasilan", "total penghasilan", "total pendapatan", "penghasilan", "pendapatan",
+                            "jumlah pendapatan", "jumlah penghasilan", "total penjualan", "pendapatan bersih"
+                        ];
+                        
+                        let inferredIncomeColName = null;
+                        for (const col of columns) {
+                            if (commonIncomeCols.includes(String(col).toLowerCase().trim())) {
+                                inferredIncomeColName = String(col);
+                                break;
+                            }
+                        }
+
+                        if (inferredIncomeColName) {
+                            logToConsole(`Kolom 'Total Penghasilan' terdeteksi secara heuristik: '${inferredIncomeColName}' di ${file.name}`, 'success');
+                            // Asumsikan data dimulai dari baris setelah header yang terdeteksi
+                            loadedSheets['Income'] = rawData.slice(1).map(row => {
+                                const obj = {};
+                                columns.forEach((col, idx) => {
+                                    obj[String(col)] = row[idx];
+                                });
+                                return obj;
+                            });
+                            loadedSheets['Income']._incomeColName = inferredIncomeColName;
+                        } else {
+                            logToConsole(`Gagal menentukan kolom 'Total Penghasilan' di sheet 'Income' dari ${file.name}. File ini dilewati.`, 'error');
+                            continue; // Lewati file ini jika kolom kunci tidak dapat diidentifikasi
+                        }
                     }
                 } // Akhir dari if (workbook.SheetNames.includes('Income'))
 
@@ -571,32 +603,14 @@
 
                 let incomeColName = null;
                 if (loadedSheets['Income']) {
-                    const dfIncomeTemp = loadedSheets['Income']; // Ini adalah array of objects
-                    const columns = Object.keys(dfIncomeTemp[0] || {});
-
-                    const commonIncomeCols = [
-                        "Total Penghasilan", "total penghasilan", "total pendapatan", "penghasilan", "pendapatan",
-                        "jumlah pendapatan", "jumlah penghasilan", "total penjualan", "pendapatan bersih"
-                    ];
-
-                    for (const col of columns) {
-                        if (commonIncomeCols.includes(col.toLowerCase().trim())) {
-                            incomeColName = col;
-                            break;
-                        }
-                    }
-
-                    if (incomeColName) {
-                        logToConsole(`Kolom 'Total Penghasilan' terdeteksi otomatis: '${incomeColName}' di ${file.name}`, 'success');
-                        // In HTML/JS, we can't directly confirm with prompt for each file
-                        // For simplicity, we'll auto-accept for now.
-                        // Or you could build a more complex UI for confirmation.
-                    } else {
+                    incomeColName = loadedSheets['Income']._incomeColName;
+                    if (!incomeColName) {
+                         // Fallback to manual prompt if _incomeColName was not set (e.g., if initial detection failed)
+                        const dfIncomeTemp = loadedSheets['Income'];
+                        const columns = Object.keys(dfIncomeTemp[0] || {});
                         logToConsole(`Peringatan: Tidak dapat mendeteksi kolom 'Total Penghasilan' secara otomatis untuk ${file.name}.`, 'warning');
                         logToConsole(`Kolom yang terdeteksi di sheet 'Income': ${columns.join(', ')}`, 'info');
                         const manualCol = prompt(`Masukkan NAMA KOLOM untuk 'Total Penghasilan' dari daftar di atas untuk ${file.name}:`);
-                        console.log("Nilai dari prompt (manualCol):", manualCol); 
-                        console.log("Daftar kolom yang tersedia (columns):", columns);
                         if (columns.includes(manualCol)) {
                                 incomeColName = manualCol;
                                 logToConsole(`Kolom 'Total Penghasilan' diatur secara manual ke: '${incomeColName}' untuk ${file.name}`, 'success');
@@ -604,7 +618,7 @@
                                 logToConsole(`Nama kolom '${manualCol}' tidak ditemukan. Gagal menentukan kolom 'Total Penghasilan' untuk ${file.name}. File ini dilewati.`, 'error');
                                 continue;
                             }
-                        }
+                    }
                 } else {
                     logToConsole(`Sheet 'Income' tidak ditemukan, tidak dapat menentukan kolom 'Total Penghasilan' untuk ${file.name}. File ini dilewati.`, 'warning');
                     continue;
@@ -650,7 +664,7 @@
 
             if (!detectedMonth) {
                 logToConsole(`Peringatan: Bulan tidak terdeteksi otomatis dari nama file: ${file.name}.`, 'warning');
-                const userInput = prompt(`Masukkan bulan untuk ${file.name} (misal: Jan, Februari, dll.):`);
+                const userInput = prompt(`Masukkan bulan untuk ${file.name} (misal: Januari, Februari, dll.):`);
                 month = normalizeMonthInput(userInput);
                 if (!month) {
                     logToConsole(`Bulan tidak valid untuk ${file.name}. File ini dilewati.`, 'error');
@@ -703,7 +717,7 @@
             bulanPenghasilan.forEach(month => {
                 const option = document.createElement('option');
                 option.value = month;
-                option.textContent = month;
+                option.textContent = month; // Display full month name
                 selectElement.appendChild(option);
             });
         }
@@ -860,7 +874,7 @@
             bulanPenghasilan.forEach(month => {
                 const option = document.createElement('option');
                 option.value = month;
-                option.textContent = month;
+                option.textContent = month; // Display full month name
                 selectElement.appendChild(option);
             });
         }
@@ -927,7 +941,7 @@
         eligibleMonths.forEach(month => {
             const option = document.createElement('option');
             option.value = month;
-            option.textContent = month;
+            option.textContent = month; // Display full month name
             selectElement.appendChild(option);
         });
 
@@ -939,6 +953,16 @@
         const selectElement = document.getElementById('analysisMonthSelect');
         const analyzeSpecificMonthBtn = document.getElementById('analyzeSpecificMonthBtn');
         analyzeSpecificMonthBtn.disabled = selectElement.value === "";
+    }
+
+    function analyzeSpecificMonth() {
+        const selectedMonth = document.getElementById('analysisMonthSelect').value;
+        if (selectedMonth) {
+            const results = hitungDanTampilkanMetrik(selectedMonth, true); // true for console output
+            displayAnalysisResults(selectedMonth, results);
+        } else {
+            logToConsole("Pilih bulan terlebih dahulu untuk analisis spesifik.", 'error');
+        }
     }
 
     function hitungDanTampilkanMetrik(bulan, printToConsole = true) {
@@ -1250,7 +1274,7 @@
         const exportChoice = prompt("Pilih opsi ekspor:\n1. Ekspor Laporan Bulan Spesifik\n2. Ekspor Laporan Semua Bulan ke Satu File\n\nMasukkan 1 atau 2:");
         
         if (exportChoice === '1') {
-            const monthToExport = prompt("Masukkan bulan yang ingin diekspor (misal: Jan, Feb):");
+            const monthToExport = prompt("Masukkan bulan yang ingin diekspor (misal: Januari, Februari):");
             const normalizedMonth = normalizeMonthInput(monthToExport);
             if (eligibleMonths.includes(normalizedMonth)) {
                 const singleMonthAnalysisData = hitungDanTampilkanMetrik(normalizedMonth, false); // No console print
