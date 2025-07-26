@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program Rasio Keuangan - Web App</title>
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* CSS untuk styling (mirip dengan colorama dan Tkinter Anda) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 0;
+            border-radius: 8px 8px 0 0;
+            margin-top: -30px; /* Adjust to sit at the top of container */
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: white;
+            margin: 0;
+        }
+        .menu-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        .menu-button, .action-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            /* min-width: 180px; - Removed for more responsiveness */
+            flex: 1 1 auto; /* Allows buttons to grow and shrink */
+            max-width: 100%; /* Prevents buttons from becoming too wide on large screens */
+        }
+        .menu-button {
+            background-color: #2ecc71; /* Green for main menu */
+            color: white;
+        }
+        .menu-button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        .action-button {
+            background-color: #3498db; /* Blue for actions */
+            color: white;
+        }
+        .action-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .input-section {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+        .input-section h3 {
+            color: #34495e;
+            border-bottom: 2px solid #bdc3c7;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input[type="file"],
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select { /* Added select here */
+            width: calc(100% - 22px); /* Adjust for padding and border */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .output-console {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap; /* Preserve whitespace and break lines */
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            border: 1px solid #1a252f;
+        }
+        .message-success { color: #2ecc71; }
+        .message-info { color: #3498db; }
+        .message-warning { color: #f39c12; }
+        .message-error { color: #e74c3c; }
+
+        .analysis-results {
+            background-color: #e8f6f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #a3d9cf;
+            overflow-x: auto; /* Added for horizontal scrolling on small screens */
+        }
+        .analysis-results h3 {
+            color: #28a745;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .analysis-table th, .analysis-table td {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .analysis-table th {
+            background-color: #cfe8e0;
+            color: #34495e;
+            font-weight: bold;
+        }
+        .analysis-table tr:nth-child(even) {
+            background-color: #f8fcfb;
+        }
+        .analysis-table td:nth-child(2) {
+            font-weight: bold;
+            text-align: right;
+        }
+        .profit-status {
+            color: #2ecc71; /* Green for profit */
+            font-weight: bold;
+        }
+        .loss-status {
+            color: #e74c3c; /* Red for loss */
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+        .month-select {
+            margin-top: 15px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: center; /* Vertically align items */
+            flex-wrap: wrap; /* Allow buttons to wrap to the next line */
+        }
+        .button-group .right-aligned-button {
+            margin-left: auto; /* Pushes this button to the right */
+        }
+
+        /* Media queries for even finer control on very small screens */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            .menu-buttons {
+                flex-direction: column; /* Stack menu buttons vertically on small screens */
+                align-items: stretch;
+            }
+            .menu-button, .action-button {
+                width: 100%; /* Make buttons full width */
+                margin-bottom: 5px; /* Add some space between stacked buttons */
+            }
+            .button-group {
+                flex-direction: column; /* Stack button groups vertically */
+                align-items: stretch; /* Stretch buttons to full width */
+            }
+            .button-group .right-aligned-button {
+                margin-left: 0; /* Remove auto margin when stacked */
+                margin-top: 10px; /* Add spacing if they stack */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📊 Program Rasio Keuangan 📈</h1>
+    </div>
+
+    <div class="menu-buttons">
+        <button class="menu-button" onclick="showSection('inputPenghasilan')">1. Input Dokumen Penghasilan</button>
+        <button class="menu-button" onclick="showSection('inputOrder')">2. Input Dokumen Order</button>
+        <button class="menu-button" onclick="showSection('inputIklan')">3. Input Biaya Iklan</button>
+        <button class="menu-button" onclick="showSection('inputHPP')">4. Input HPP Produk</button>
+        <button class="menu-button" onclick="showSection('inputOperasional')">5. Input Biaya Operasional</button>
+        <button class="menu-button" onclick="showSection('analisisKeuangan')">6. Analisis Keuangan</button>
+        <button class="menu-button" onclick="exportReport()">7. Ekspor Laporan</button>
+    </div>
+
+    <div id="outputConsole" class="output-console">
+        <span class="message-info">Selamat datang di Program Rasio Keuangan berbasis Web!</span><br>
+        <span class="message-info">Pilih menu di atas untuk memulai.</span>
+    </div>
+
+    <div id="inputPenghasilan" class="input-section hidden">
+        <h3>1. Input Dokumen Penghasilan</h3>
+        <p>Pilih satu atau beberapa file Excel Dokumen Penghasilan Anda.</p>
+        <div class="form-group">
+            <label for="penghasilanFileInput">Pilih File Excel:</label>
+            <input type="file" id="penghasilanFileInput" multiple accept=".xlsx">
+        </div>
+        <div class="button-group">
+            <button class="action-button" onclick="processPenghasilanFiles()">Proses File Penghasilan</button>
+            <button class="action-button right-aligned-button" onclick="showNextSection('inputPenghasilan')">NEXT</button>
+        </div>
+        <div id="penghasilanProcessingStatus" style="margin-top: 10px;"></div>
+    </div>
+
+    <div id="inputOrder" class="input-section hidden">
+        <h3>2. Input Dokumen Order</h3>
+        <p>Pilih satu atau beberapa file Excel Dokumen Order Anda.</p>
+        <div class="form-group">
+            <label for="orderFileInput">Pilih File Excel:</label>
+            <input type="file" id="orderFileInput" multiple accept=".xlsx">
+        </div>
+        <div class="button-group">
+            <button class="action-button" onclick="processOrderFiles()">Proses File Order</button>
+            <button class="action-button right-aligned-button" onclick="showNextSection('inputOrder')">NEXT</button>
+        </div>
+        <div id="orderProcessingStatus" style="margin-top: 10px;"></div>
+    </div>
+
+    <div id="inputIklan" class="input-section hidden">
+        <h3>3. Input Biaya Iklan</h3>
+        <div class="form-group">
+            <label for="iklanMonthSelect">Bulan:</label>
+            <select id="iklanMonthSelect" class="month-select">
+                <option value="">-- Pilih Bulan --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="iklanNominal">Nominal Biaya Iklan (Rp):</label>
+            <input type="number" id="iklanNominal" min="0" value="0" onfocus="this.select()">
+        </div>
+        <div class="button-group">
+            <button class="action-button" onclick="addBiayaIklan()">Tambahkan Biaya Iklan</button>
+            <button class="action-button right-aligned-button" onclick="showNextSection('inputIklan')">NEXT</button>
+        </div>
+    </div>
+
+    <div id="inputHPP" class="input-section hidden">
+        <h3>4. Input HPP Produk</h3>
+        <p>HPP akan diinput berdasarkan produk yang terdeteksi dari Dokumen Order.</p>
+        <div class="button-group">
+            <button class="action-button" onclick="displayHPPInput()">Mulai Input HPP</button>
+        </div>
+        <div id="hppProductList" style="margin-top: 15px;">
+        </div>
+        <div class="button-group" id="hppActionButtons" style="margin-top: 15px;">
+            <button class="action-button hidden" id="saveHPPButton" onclick="saveAllHPPs()">Simpan Semua HPP</button>
+            <button class="action-button hidden right-aligned-button" id="nextHPPButton" onclick="showNextSection('inputHPP')">NEXT</button>
+        </div>
+    </div>
+
+    <div id="inputOperasional" class="input-section hidden">
+        <h3>5. Input Biaya Operasional</h3>
+        <div class="form-group">
+            <label for="operasionalMonthSelect">Bulan:</label>
+            <select id="operasionalMonthSelect" class="month-select">
+                <option value="">-- Pilih Bulan --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="operasionalNominal">Nominal Biaya Operasional (Rp):</label>
+            <input type="number" id="operasionalNominal" min="0" value="0" onfocus="this.select()">
+        </div>
+        <div class="button-group">
+            <button class="action-button" onclick="addBiayaOperasional()">Tambahkan Biaya Operasional</button>
+            <button class="action-button right-aligned-button" onclick="showNextSection('inputOperasional')">NEXT</button>
+        </div>
+    </div>
+
+    <div id="analisisKeuangan" class="input-section hidden">
+        <h3>6. Analisis Keuangan</h3>
+        <p>Pilih opsi analisis:</p>
+        <div class="form-group">
+            <label for="analysisMonthSelect">Pilih Bulan Spesifik:</label>
+            <select id="analysisMonthSelect" class="month-select" onchange="enableSpecificMonthAnalysis()">
+                <option value="">-- Pilih Bulan --</option>
+            </select>
+            <button class="action-button" id="analyzeSpecificMonthBtn" onclick="analyzeSpecificMonth()" disabled style="margin-left: 10px;">Lihat Analisis Bulan Ini</button>
+        </div>
+        <div class="button-group">
+            <button class="action-button" onclick="analyzeAllMonths()">Tampilkan Analisis untuk Semua Bulan</button>
+        </div>
+        <div id="analysisOutput" class="analysis-results hidden">
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Variabel Global untuk Penyimpanan Data (Mirip dengan Python Anda) ---
+    const dataPenghasilan = {}; // {bulan: {summary: df_summary, income: df_income, incomeColName: 'Nama Kolom Total Penghasilan'}}
+    const dataOrder = {};       // {bulan: df_order}
+    const dataIklan = {};       // {bulan: nominal_iklan}
+    const dataOperasional = {}; // {bulan: nominal_operasional}
+    const dataHPP = {};         // {product_key: hpp_value}
+
+    const bulanPenghasilan = [];
+    const bulanOrder = [];
+    const bulanIklan = [];
+    const bulanOperasional = [];
+
+    let currentSection = ''; // Untuk melacak section yang sedang aktif
+
+    // Pemetaan bulan ke angka untuk pengurutan
+    const MONTH_ORDER = {
+        'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'Mei': 5, 'Jun': 6,
+        'Jul': 7, 'Agu': 8, 'Sep': 9, 'Okt': 10, 'Nov': 11, 'Des': 12
+    };
+    const REVERSE_MONTH_ORDER = Object.fromEntries(Object.entries(MONTH_ORDER).map(([k, v]) => [v, k]));
+
+    // Pemetaan input pengguna ke nama bulan kanonik 3 huruf kapital
+    const MONTH_INPUT_NORMALIZER = {
+        'jan': 'Jan', 'januari': 'Jan',
+        'feb': 'Feb', 'februari': 'Feb',
+        'mar': 'Mar', 'maret': 'Mar',
+        'apr': 'Apr', 'april': 'Apr',
+        'mei': 'Mei',
+        'jun': 'Jun', 'juni': 'Jun',
+        'jul': 'Jul', 'juli': 'Jul',
+        'agu': 'Agu', 'agustus': 'Agu',
+        'sep': 'Sep', 'september': 'Sep',
+        'okt': 'Okt', 'oktober': 'Okt',
+        'nov': 'Nov', 'november': 'Nov',
+        'des': 'Des', 'desember': 'Des'
+    };
+
+    // --- UTILITY FUNCTIONS ---
+
+    function logToConsole(message, type = 'info') {
+        const consoleDiv = document.getElementById('outputConsole');
+        const span = document.createElement('span');
+        span.className = 'message-' + type;
+        span.textContent = message;
+        consoleDiv.appendChild(span);
+        consoleDiv.appendChild(document.createElement('br'));
+        consoleDiv.scrollTop = consoleDiv.scrollHeight; // Scroll to bottom
+    }
+
+    function showSection(sectionId) {
+        // Sembunyikan semua section input
+        document.querySelectorAll('.input-section').forEach(section => {
+            section.classList.add('hidden');
+        });
+        // Tampilkan section yang dipilih
+        document.getElementById(sectionId).classList.remove('hidden');
+        currentSection = sectionId;
+        logToConsole(`Membuka menu: ${sectionId.replace(/([A-Z])/g, ' $1').trim()}...`, 'info');
+
+        // Khusus untuk analisis, perbarui daftar bulan yang tersedia
+        if (sectionId === 'analisisKeuangan') {
+            updateAnalysisMonthSelect();
+        }
+        // Khusus untuk input iklan, perbarui daftar bulan yang tersedia
+        if (sectionId === 'inputIklan') {
+            updateIklanMonthSelect();
+        }
+        // Khusus untuk input operasional, perbarui daftar bulan yang tersedia
+        if (sectionId === 'inputOperasional') {
+            updateOperasionalMonthSelect();
+        }
+        // Khusus untuk HPP, pastikan tombol simpan dan next tersembunyi
+        if (sectionId === 'inputHPP') {
+            document.getElementById('saveHPPButton').classList.add('hidden');
+            document.getElementById('nextHPPButton').classList.add('hidden'); // Ensure hidden
+            document.getElementById('hppProductList').innerHTML = ''; // Clear previous products
+        }
+    }
+
+    // New function to handle "NEXT" button clicks
+    function showNextSection(currentSectionId) {
+        const sectionOrder = [
+            'inputPenghasilan',
+            'inputOrder',
+            'inputIklan',
+            'inputHPP',
+            'inputOperasional',
+            'analisisKeuangan'
+        ];
+        const currentIndex = sectionOrder.indexOf(currentSectionId);
+        if (currentIndex < sectionOrder.length - 1) {
+            const nextSectionId = sectionOrder[currentIndex + 1];
+            showSection(nextSectionId);
+        } else {
+            logToConsole("Anda sudah berada di menu terakhir (Analisis Keuangan).", 'info');
+        }
+    }
+
+    function normalizeMonthInput(userInputMonth) {
+        return MONTH_INPUT_NORMALIZER[userInputMonth.trim().toLowerCase()] || null;
+    }
+
+    function extractMonthFromFilename(filename) {
+        const match = filename.match(/(\d{4})(\d{2})\d{2}(?:_\d{8})?/);
+        if (match) {
+            const monthNum = parseInt(match[2], 10);
+            if (monthNum >= 1 && monthNum <= 12) {
+                return REVERSE_MONTH_ORDER[monthNum];
+            }
+        }
+        return null;
+    }
+
+    async function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    async function parseExcelFile(arrayBuffer) {
+        try {
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            return workbook;
+        } catch (error) {
+            logToConsole(`Gagal mem-parsing file Excel: ${error.message}`, 'error');
+            return null;
+        }
+    }
+
+    // --- INPUT DATA FUNCTIONS ---
+
+    async function processPenghasilanFiles() {
+        const fileInput = document.getElementById('penghasilanFileInput');
+        const files = fileInput.files;
+        if (files.length === 0) {
+            logToConsole("Tidak ada file yang dipilih untuk Dokumen Penghasilan.", 'warning');
+            return;
+        }
+
+        document.getElementById('penghasilanProcessingStatus').innerHTML = '';
+        logToConsole(`Memproses ${files.length} file Penghasilan...`, 'info');
+
+        for (const file of files) {
+            logToConsole(`--- Memproses file: ${file.name} ---`, 'info');
+            let detectedMonth = extractMonthFromFilename(file.name);
+            let month = detectedMonth;
+
+            if (!detectedMonth) {
+                logToConsole(`Peringatan: Bulan tidak terdeteksi otomatis dari nama file: ${file.name}.`, 'warning');
+                const userInput = prompt(`Masukkan bulan untuk ${file.name} (misal: Jan, Februari, dll.):`);
+                month = normalizeMonthInput(userInput);
+                if (!month) {
+                    logToConsole(`Bulan tidak valid untuk ${file.name}. File ini dilewati.`, 'error');
+                    continue;
+                }
+            } else {
+                logToConsole(`Menggunakan bulan terdeteksi: ${month} untuk ${file.name}`, 'success');
+            }
+
+            try {
+                const arrayBuffer = await readFileAsArrayBuffer(file);
+                const workbook = await parseExcelFile(arrayBuffer);
+                if (!workbook) continue;
+
+                const loadedSheets = {};
+                if (workbook.SheetNames.includes('Summary')) {
+                    const sheet = workbook.Sheets['Summary'];
+                    // Baca sheet summary sebagai array of arrays
+                    loadedSheets['Summary'] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    logToConsole(`Berhasil memuat sheet 'Summary' dari ${file.name}`, 'success');
+                } else {
+                    logToConsole(`Sheet 'Summary' tidak ditemukan di ${file.name}.`, 'warning');
+                }
+
+                if (workbook.SheetNames.includes('Income')) {
+                    const sheet = workbook.Sheets['Income'];
+
+                    // Dapatkan data sheet tanpa mengasumsikan header apapun (membaca semua sel sebagai data)
+                    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true }); // header: 1 untuk mendapatkan array of arrays, raw:true untuk nilai mentah
+
+                    // Daftar header yang Anda berikan sebelumnya, sesuaikan persis dengan di Excel
+                    const expectedHeaders = [
+                        "No.", "No. Pesanan", "No. Pengajuan", "Username (Pembeli)", "Waktu Pesanan Dibuat", "Metode pembayaran pembeli", "Tanggal Dana Dilepaskan", "Harga Asli Produk", "Total Diskon Produk", "Jumlah Pengembalian Dana ke Pembeli", "Diskon Produk dari Shopee", "Diskon Voucher Ditanggung Penjual", "Cashback Koin yang Ditanggung Penjual", "Ongkir Dibayar Pembeli", "Diskon Ongkir Ditanggung Jasa Kirim", "Gratis Ongkir dari Shopee", "Ongkir yang Diteruskan oleh Shopee ke Jasa Kirim", "Ongkos Kirim Pengembalian Barang", "Kembali ke Biaya Pengiriman Pengirim", "Pengembalian Biaya Kirim", "Biaya Komisi AMS", "Biaya Administrasi", "Biaya Layanan (termasuk PPN 11%)", "Biaya Proses Pesanan", "Premi", "Biaya Program", "Biaya Transaksi", "Biaya Kampanye", "Bea Masuk, PPN & PPh", "Total Penghasilan", "Kode Voucher", "Kompensasi", "Promo Gratis Ongkir dari Penjual", "Jasa Kirim", "Nama Kurir", "", "Pengembalian Dana ke Pembeli", "Pro-rata Koin yang Ditukarkan untuk Pengembalian Barang", "Pro-rata Voucher Shopee untuk Pengembalian Barang", "Pro-rated Bank Payment Channel Promotion  for return refund Items", "Pro-rated Shopee Payment Channel Promotion  for return refund Items"
+                    ];
+
+                    let headerRowFound = -1;
+                    let dataStartIndex = 0; // Baris tempat data dimulai setelah header
+
+                    // Cari baris yang mengandung 'Total Penghasilan' sebagai indikator header
+                    // Batasi pencarian hingga 100 baris pertama untuk efisiensi
+                    for (let i = 0; i < Math.min(rawData.length, 100); i++) {
+                        const row = rawData[i];
+                        // Konversi objek baris menjadi array nilai untuk pencarian
+                        const rowValues = Object.values(row).map(val => (typeof val === 'string' ? val.trim() : ''));
+                        if (rowValues.map(v => v.toLowerCase()).includes('total penghasilan')) {
+                            headerRowFound = i;
+                            dataStartIndex = i + 1; // Data dimulai di baris setelah header
+                            break;
+                        }
+                    }
+
+                    if (headerRowFound !== -1) {
+                        // Jika baris header ditemukan, gunakan baris tersebut sebagai kunci untuk data
+                        const actualHeaders = Object.values(rawData[headerRowFound]); // Ambil header dari baris yang ditemukan
+
+                        // Buat ulang data dengan header yang ditemukan
+                        const processedData = [];
+                        for (let i = dataStartIndex; i < rawData.length; i++) {
+                            const row = rawData[i];
+                            const newRow = {};
+                            for (let j = 0; j < actualHeaders.length; j++) {
+                                const header = actualHeaders[j];
+                                // PERBAIKAN DI SINI: Akses sel dengan indeks angka 'j'
+                                const cellValue = row[j]; 
+                                newRow[header] = cellValue !== undefined ? cellValue : null;
+                            }
+                            processedData.push(newRow);
+                        }
+
+                        loadedSheets['Income'] = processedData;
+                        logToConsole(`Berhasil memuat sheet 'Income' dari ${file.name}. Header 'Total Penghasilan' ditemukan di baris ke-${headerRowFound + 1}.`, 'success');
+
+                        // Set nama kolom penghasilan untuk pemrosesan selanjutnya
+                        loadedSheets['Income']._incomeColName = actualHeaders.find(h => h.toLowerCase() === 'total penghasilan') || 'Total Penghasilan';
+
+                    } else {
+                        // ... (kode fallback prompt manual tetap sama)
+                    }
+                } // Akhir dari if (workbook.SheetNames.includes('Income'))
+
+                if (!loadedSheets['Summary'] && !loadedSheets['Income']) {
+                    logToConsole(`Tidak ada sheet 'Summary' atau 'Income' yang valid ditemukan di ${file.name}. File dilewati.`, 'error');
+                    continue;
+                }
+
+                let incomeColName = null;
+                if (loadedSheets['Income']) {
+                    const dfIncomeTemp = loadedSheets['Income']; // Ini adalah array of objects
+                    const columns = Object.keys(dfIncomeTemp[0] || {});
+
+                    const commonIncomeCols = [
+                        "Total Penghasilan", "total penghasilan", "total pendapatan", "penghasilan", "pendapatan",
+                        "jumlah pendapatan", "jumlah penghasilan", "total penjualan", "pendapatan bersih"
+                    ];
+
+                    for (const col of columns) {
+                        if (commonIncomeCols.includes(col.toLowerCase().trim())) {
+                            incomeColName = col;
+                            break;
+                        }
+                    }
+
+                    if (incomeColName) {
+                        logToConsole(`Kolom 'Total Penghasilan' terdeteksi otomatis: '${incomeColName}' di ${file.name}`, 'success');
+                        // In HTML/JS, we can't directly confirm with prompt for each file
+                        // For simplicity, we'll auto-accept for now.
+                        // Or you could build a more complex UI for confirmation.
+                    } else {
+                        logToConsole(`Peringatan: Tidak dapat mendeteksi kolom 'Total Penghasilan' secara otomatis untuk ${file.name}.`, 'warning');
+                        logToConsole(`Kolom yang terdeteksi di sheet 'Income': ${columns.join(', ')}`, 'info');
+                        const manualCol = prompt(`Masukkan NAMA KOLOM untuk 'Total Penghasilan' dari daftar di atas untuk ${file.name}:`);
+                        console.log("Nilai dari prompt (manualCol):", manualCol); 
+                        console.log("Daftar kolom yang tersedia (columns):", columns);
+                        if (columns.includes(manualCol)) {
+                                incomeColName = manualCol;
+                                logToConsole(`Kolom 'Total Penghasilan' diatur secara manual ke: '${incomeColName}' untuk ${file.name}`, 'success');
+                            } else {
+                                logToConsole(`Nama kolom '${manualCol}' tidak ditemukan. Gagal menentukan kolom 'Total Penghasilan' untuk ${file.name}. File ini dilewati.`, 'error');
+                                continue;
+                            }
+                        }
+                } else {
+                    logToConsole(`Sheet 'Income' tidak ditemukan, tidak dapat menentukan kolom 'Total Penghasilan' untuk ${file.name}. File ini dilewati.`, 'warning');
+                    continue;
+                }
+
+                // Simpan data
+                dataPenghasilan[month] = {
+                    summary: loadedSheets['Summary'],
+                    income: loadedSheets['Income'],
+                    incomeColName: incomeColName
+                };
+                if (!bulanPenghasilan.includes(month)) {
+                    bulanPenghasilan.push(month);
+                    bulanPenghasilan.sort((a, b) => MONTH_ORDER[a] - MONTH_ORDER[b]);
+                }
+                logToConsole(`Dokumen Penghasilan untuk bulan ${month} berhasil dimuat.`, 'success');
+
+            } catch (error) {
+                logToConsole(`Gagal memproses file ${file.name}: ${error.message}`, 'error');
+            }
+        }
+        logToConsole("Selesai memproses Dokumen Penghasilan.", 'info');
+        fileInput.value = ''; // Reset file input
+        updateIklanMonthSelect(); // Update the iklan month dropdown after processing penghasilan files
+        updateOperasionalMonthSelect(); // Update the operasional month dropdown
+    }
+
+    async function processOrderFiles() {
+        const fileInput = document.getElementById('orderFileInput');
+        const files = fileInput.files;
+        if (files.length === 0) {
+            logToConsole("Tidak ada file yang dipilih untuk Dokumen Order.", 'warning');
+            return;
+        }
+
+        document.getElementById('orderProcessingStatus').innerHTML = '';
+        logToConsole(`Memproses ${files.length} file Order...`, 'info');
+
+        for (const file of files) {
+            logToConsole(`--- Memproses file: ${file.name} ---`, 'info');
+            let detectedMonth = extractMonthFromFilename(file.name);
+            let month = detectedMonth;
+
+            if (!detectedMonth) {
+                logToConsole(`Peringatan: Bulan tidak terdeteksi otomatis dari nama file: ${file.name}.`, 'warning');
+                const userInput = prompt(`Masukkan bulan untuk ${file.name} (misal: Jan, Februari, dll.):`);
+                month = normalizeMonthInput(userInput);
+                if (!month) {
+                    logToConsole(`Bulan tidak valid untuk ${file.name}. File ini dilewati.`, 'error');
+                    continue;
+                }
+            } else {
+                logToConsole(`Menggunakan bulan terdeteksi: ${month} untuk ${file.name}`, 'success');
+            }
+
+            try {
+                const arrayBuffer = await readFileAsArrayBuffer(file);
+                const workbook = await parseExcelFile(arrayBuffer);
+                if (!workbook) continue;
+
+                // Asumsi sheet order adalah sheet pertama atau bernama 'Sheet1'
+                const sheetName = workbook.SheetNames[0] || 'Sheet1';
+                if (!workbook.SheetNames.includes(sheetName)) {
+                    logToConsole(`Sheet '${sheetName}' tidak ditemukan di ${file.name}. File dilewati.`, 'error');
+                    continue;
+                }
+
+                const dfOrder = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+                
+                dataOrder[month] = dfOrder;
+                if (!bulanOrder.includes(month)) {
+                    bulanOrder.push(month);
+                    bulanOrder.sort((a, b) => MONTH_ORDER[a] - MONTH_ORDER[b]);
+                }
+                logToConsole(`Dokumen Order untuk bulan ${month} berhasil dimuat.`, 'success');
+
+            } catch (error) {
+                logToConsole(`Gagal memproses file ${file.name}: ${error.message}`, 'error');
+            }
+        }
+        logToConsole("Selesai memproses Dokumen Order.", 'info');
+        fileInput.value = ''; // Reset file input
+    }
+
+    function updateIklanMonthSelect() {
+        const selectElement = document.getElementById('iklanMonthSelect');
+        
+        // Clear existing options
+        selectElement.innerHTML = '<option value="">-- Pilih Bulan --</option>';
+
+        if (bulanPenghasilan.length === 0) {
+            selectElement.disabled = true;
+            logToConsole("Tidak ada dokumen Penghasilan yang dimuat. Harap input Dokumen Penghasilan terlebih dahulu untuk memilih bulan iklan.", 'warning');
+        } else {
+            selectElement.disabled = false;
+            bulanPenghasilan.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                selectElement.appendChild(option);
+            });
+        }
+    }
+
+    function addBiayaIklan() {
+        const month = document.getElementById('iklanMonthSelect').value;
+        const nominalInput = parseFloat(document.getElementById('iklanNominal').value);
+
+        if (!month) {
+            logToConsole("Pilih bulan terlebih dahulu.", 'error');
+            return;
+        }
+        if (isNaN(nominalInput) || nominalInput < 0) {
+            logToConsole("Nominal tidak valid. Masukkan angka positif.", 'error');
+            return;
+        }
+
+        dataIklan[month] = nominalInput;
+        if (!bulanIklan.includes(month)) {
+            bulanIklan.push(month);
+            bulanIklan.sort((a, b) => MONTH_ORDER[a] - MONTH_ORDER[b]);
+        }
+        logToConsole(`Biaya iklan ${month} sebesar Rp ${nominalInput.toLocaleString('id-ID')} berhasil disimpan.`, 'success');
+        document.getElementById('iklanNominal').value = '0';
+        document.getElementById('iklanMonthSelect').value = ''; // Reset dropdown
+    }
+
+    function getUniqueProductsFromAllOrders() {
+        const allProductsData = new Set(); // Menggunakan Set untuk keunikan
+        const requiredColumns = ["SKU Induk", "Nama Produk", "Nomor Referensi SKU", "Nama Variasi"];
+
+        let hasOrderData = false;
+        for (const month in dataOrder) {
+            if (dataOrder.hasOwnProperty(month) && dataOrder[month].length > 0) {
+                hasOrderData = true;
+                const dfOrder = dataOrder[month];
+                
+                // Cek apakah semua kolom yang dibutuhkan ada di dfOrder pertama
+                const firstRow = dfOrder[0] || {};
+                const missingCols = requiredColumns.filter(col => !Object.keys(firstRow).includes(col));
+                if (missingCols.length > 0) {
+                    logToConsole(`Kolom identifikasi produk yang hilang di Dokumen Order (${month}): ${missingCols.join(', ')}. Tidak dapat mengisi HPP produk tanpa ini.`, 'error');
+                    logToConsole(`Pastikan nama kolom di Dokumen Order Anda persis sama dengan: 'SKU Induk', 'Nama Produk', 'Nomor Referensi SKU', 'Nama Variasi'.`, 'error');
+                    return [];
+                }
+
+                for (const row of dfOrder) {
+                    try {
+                        const skuInduk = (row['SKU Induk'] || '').toString().trim();
+                        const namaProduk = (row['Nama Produk'] || '').toString().trim();
+                        const refSku = (row['Nomor Referensi SKU'] || '').toString().trim();
+                        const variasi = (row['Nama Variasi'] || '').toString().trim();
+                        const key = `${skuInduk} | ${namaProduk} | ${refSku} | ${variasi}`;
+                        allProductsData.add(key);
+                    } catch (e) {
+                        logToConsole(`Peringatan: Gagal memproses baris produk unik: ${e.message}`, 'warning');
+                        continue;
+                    }
+                }
+            }
+        }
+        if (!hasOrderData) {
+            logToConsole("Peringatan: Tidak ada dokumen Order yang dimuat untuk mengekstrak produk unik.", 'warning');
+            return [];
+        }
+        return Array.from(allProductsData).sort();
+    }
+
+    function displayHPPInput() {
+        if (Object.keys(dataOrder).length === 0) {
+            logToConsole("Belum ada Dokumen Order yang diinput. Harap input Dokumen Order terlebih dahulu (Menu 2).", 'warning');
+            return;
+        }
+
+        const uniqueProducts = getUniqueProductsFromAllOrders();
+        const hppProductListDiv = document.getElementById('hppProductList');
+        hppProductListDiv.innerHTML = ''; // Clear previous list
+
+        if (uniqueProducts.length === 0) {
+            hppProductListDiv.innerHTML = '<p class="message-warning">Tidak ada produk unik yang ditemukan di Dokumen Order yang dimuat atau ada kolom yang hilang.</p>';
+            document.getElementById('saveHPPButton').classList.add('hidden');
+            document.getElementById('nextHPPButton').classList.add('hidden'); // Ensure hidden
+            return;
+        }
+
+        logToConsole("Berikut daftar produk unik yang terdeteksi. Masukkan HPP-nya:", 'info');
+
+        uniqueProducts.forEach(productKey => {
+            const currentHPP = dataHPP[productKey] || 0;
+            const productDiv = document.createElement('div');
+            productDiv.className = 'form-group';
+            productDiv.innerHTML = `
+                <label>${productKey}</label>
+                <input type="number" data-product-key="${productKey}" value="${currentHPP}" min="0" placeholder="HPP (Rp)" 
+                    style="width: calc(100% - 100px); display: inline-block;"
+                    onfocus="this.select()"
+                    onkeydown="handleHPPInputKeyDown(event, this)">
+                <span style="margin-left: 10px; font-weight: bold;">Rp ${currentHPP.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+            `;
+            hppProductListDiv.appendChild(productDiv);
+        });
+
+        document.getElementById('saveHPPButton').classList.remove('hidden');
+        document.getElementById('nextHPPButton').classList.remove('hidden'); // Show NEXT button as well
+    }
+
+    function handleHPPInputKeyDown(event, currentInput) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default Enter key behavior (e.g., form submission)
+            const inputs = Array.from(document.querySelectorAll('#hppProductList input[type="number"]'));
+            const currentIndex = inputs.indexOf(currentInput);
+            if (currentIndex > -1 && currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+                inputs[currentIndex + 1].select(); // Automatically select text in the next field
+            } else {
+                // If it's the last input, optionally focus on the save button or do something else
+                document.getElementById('saveHPPButton').focus();
+            }
+        }
+    }
+
+
+    function saveAllHPPs() {
+        const hppInputs = document.querySelectorAll('#hppProductList input[type="number"]');
+        let allValid = true;
+        hppInputs.forEach(input => {
+            const productKey = input.dataset.productKey;
+            const hppValue = parseFloat(input.value);
+            if (isNaN(hppValue) || hppValue < 0) {
+                logToConsole(`HPP tidak valid untuk produk: ${productKey}. Harus angka positif.`, 'error');
+                allValid = false;
+            } else {
+                dataHPP[productKey] = hppValue;
+            }
+        });
+
+        if (allValid) {
+            logToConsole("Semua HPP berhasil disimpan/diperbarui.", 'success');
+        }
+    }
+
+    function updateOperasionalMonthSelect() {
+        const selectElement = document.getElementById('operasionalMonthSelect');
+        
+        // Clear existing options
+        selectElement.innerHTML = '<option value="">-- Pilih Bulan --</option>';
+
+        if (bulanPenghasilan.length === 0) {
+            selectElement.disabled = true;
+            logToConsole("Tidak ada dokumen Penghasilan yang dimuat. Harap input Dokumen Penghasilan terlebih dahulu untuk memilih bulan operasional.", 'warning');
+        } else {
+            selectElement.disabled = false;
+            bulanPenghasilan.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                selectElement.appendChild(option);
+            });
+        }
+    }
+
+    function addBiayaOperasional() {
+        const month = document.getElementById('operasionalMonthSelect').value; // Get value from dropdown
+        const nominalInput = parseFloat(document.getElementById('operasionalNominal').value);
+
+        if (!month) {
+            logToConsole("Pilih bulan terlebih dahulu.", 'error');
+            return;
+        }
+        if (isNaN(nominalInput) || nominalInput < 0) {
+            logToConsole("Nominal tidak valid. Masukkan angka positif.", 'error');
+            return;
+        }
+
+        dataOperasional[month] = nominalInput;
+        if (!bulanOperasional.includes(month)) {
+            bulanOperasional.push(month);
+            bulanOperasional.sort((a, b) => MONTH_ORDER[a] - MONTH_ORDER[b]);
+        }
+        logToConsole(`Biaya operasional ${month} sebesar Rp ${nominalInput.toLocaleString('id-ID')} berhasil disimpan.`, 'success');
+        document.getElementById('operasionalNominal').value = '0';
+        document.getElementById('operasionalMonthSelect').value = ''; // Reset dropdown
+    }
+
+    // --- ANALYSIS FUNCTIONS ---
+
+    function getEligibleMonths() {
+        const eligible = new Set();
+        // Sebuah bulan eligible jika ada data penghasilan untuk bulan tersebut
+        // DAN ada data order (dari bulan manapun) untuk perhitungan HPP.
+        
+        if (Object.keys(dataOrder).length === 0) { // Jika belum ada dokumen order sama sekali
+            return [];
+        }
+
+        for (const month of bulanPenghasilan) {
+            if (dataPenghasilan[month]) {
+                eligible.add(month);
+            }
+        }
+        return Array.from(eligible).sort((a, b) => MONTH_ORDER[a] - MONTH_ORDER[b]);
+    }
+
+    function updateAnalysisMonthSelect() {
+        const selectElement = document.getElementById('analysisMonthSelect');
+        const eligibleMonths = getEligibleMonths();
+
+        // Clear existing options
+        selectElement.innerHTML = '<option value="">-- Pilih Bulan --</option>';
+
+        if (eligibleMonths.length === 0) {
+            const analyzeSpecificMonthBtn = document.getElementById('analyzeSpecificMonthBtn');
+            analyzeSpecificMonthBtn.disabled = true;
+            selectElement.disabled = true;
+            return;
+        } else {
+            selectElement.disabled = false;
+        }
+
+        eligibleMonths.forEach(month => {
+            const option = document.createElement('option');
+            option.value = month;
+            option.textContent = month;
+            selectElement.appendChild(option);
+        });
+
+        // Disable "Lihat Analisis Bulan Ini" button if no month is selected by default
+        document.getElementById('analyzeSpecificMonthBtn').disabled = true;
+    }
+
+    function enableSpecificMonthAnalysis() {
+        const selectElement = document.getElementById('analysisMonthSelect');
+        const analyzeSpecificMonthBtn = document.getElementById('analyzeSpecificMonthBtn');
+        analyzeSpecificMonthBtn.disabled = selectElement.value === "";
+    }
+
+    function hitungDanTampilkanMetrik(bulan, printToConsole = true) {
+        logToConsole(`\n=== ANALISIS KEUANGAN BULAN ${bulan.toUpperCase()} ===`, 'info');
+
+        let totalPendapatanSummary = 0;
+        let biayaAdminLayanan = 0;
+        let totalPenghasilanIncome = 0;
+        let totalHPP = 0;
+        let biayaOperasional = dataOperasional[bulan] || 0;
+        let biayaIklan = dataIklan[bulan] || 0;
+        let totalItemTerjualForBasketSize = 0;
+        let jumlahOrderUnikFromIncome = 0;
+
+        const ORDER_ID_COL = "No. Pesanan";
+        const QUANTITY_COL = "Jumlah";
+        const PRODUCT_IDENTIFIER_COLS = ["SKU Induk", "Nama Produk", "Nomor Referensi SKU", "Nama Variasi"];
+
+        if (dataPenghasilan[bulan] && dataPenghasilan[bulan].summary) {
+            const dfSummary = dataPenghasilan[bulan].summary; // Ini adalah array of arrays
+            // Asumsi D11 adalah dfSummary[10][3]
+            try {
+                // Di dataSummary, dfSummary[10] adalah baris ke-11, dfSummary[10][3] adalah kolom ke-4 (D)
+                totalPendapatanSummary = parseFloat(dfSummary[10][3]) || 0;
+                if (isNaN(totalPendapatanSummary)) {
+                    totalPendapatanSummary = 0;
+                    logToConsole(`Peringatan: Sel D11 (Total Pendapatan) di sheet Summary kosong atau bukan angka untuk bulan ${bulan}. Diatur ke 0.`, 'warning');
+                }
+            } catch (e) {
+                totalPendapatanSummary = 0;
+                logToConsole(`Error saat membaca sel D11 di sheet Summary untuk bulan ${bulan}: ${e.message}. Total Pendapatan diatur ke 0.`, 'error');
+            }
+
+            // Asumsi D22 adalah dfSummary[21][3]
+            try {
+                biayaAdminLayanan = parseFloat(dfSummary[21][3]) || 0;
+                if (isNaN(biayaAdminLayanan)) {
+                    biayaAdminLayanan = 0;
+                    logToConsole(`Peringatan: Sel D22 (Biaya Admin & Layanan) di sheet Summary kosong atau bukan angka untuk bulan ${bulan}. Diatur ke 0.`, 'warning');
+                }
+            } catch (e) {
+                biayaAdminLayanan = 0;
+                logToConsole(`Error saat membaca sel D22 di sheet Summary untuk bulan ${bulan}: ${e.message}. Biaya Admin & Layanan diatur ke 0.`, 'error');
+            }
+        } else {
+            logToConsole(`Peringatan: Dokumen Penghasilan (sheet Summary) tidak tersedia atau tidak lengkap untuk bulan ${bulan}. Total Pendapatan dan Biaya Admin & Layanan akan 0.`, 'warning');
+        }
+
+        if (dataPenghasilan[bulan] && dataPenghasilan[bulan].income) {
+            const dfIncome = dataPenghasilan[bulan].income; // Ini adalah array of objects
+            const incomeTotalColName = dataPenghasilan[bulan].incomeColName;
+
+            if (incomeTotalColName && dfIncome.length > 0 && dfIncome[0].hasOwnProperty(incomeTotalColName)) {
+                totalPenghasilanIncome = dfIncome.reduce((sum, row) => sum + (parseFloat(row[incomeTotalColName]) || 0), 0);
+            } else {
+                logToConsole(`Error: Kolom '${incomeTotalColName}' (yang Anda pilih) tidak ditemukan di sheet Income Dokumen Penghasilan untuk bulan ${bulan}. Perhitungan akan menggunakan 0.`, 'error');
+            }
+
+            // Hitung jumlah order unik dari sheet Income
+            if (dfIncome.length > 0 && dfIncome[0].hasOwnProperty(ORDER_ID_COL)) {
+                const uniqueOrderIds = new Set();
+                dfIncome.forEach(row => {
+                    if (row[ORDER_ID_COL]) uniqueOrderIds.add(String(row[ORDER_ID_COL]).trim());
+                });
+                jumlahOrderUnikFromIncome = uniqueOrderIds.size;
+            } else {
+                logToConsole(`Error: Kolom '${ORDER_ID_COL}' tidak ditemukan di sheet Income untuk menghitung jumlah order unik. Mohon periksa nama kolom atau konfigurasi header.`, 'error');
+            }
+        } else {
+            logToConsole(`Peringatan: Dokumen Penghasilan (sheet Income) tidak tersedia atau tidak lengkap untuk bulan ${bulan}. Total Penghasilan dan jumlah order unik akan 0.`, 'warning');
+        }
+
+        // --- HPP Calculation ---
+        if (dataPenghasilan[bulan] && dataPenghasilan[bulan].income && Object.keys(dataOrder).length > 0 && Object.keys(dataHPP).length > 0) {
+            const dfIncome = dataPenghasilan[bulan].income;
+            
+            const allOrderData = [];
+            for (const orderMonth in dataOrder) {
+                if (dataOrder.hasOwnProperty(orderMonth)) {
+                    allOrderData.push(...dataOrder[orderMonth]);
+                }
+            }
+            
+            if (allOrderData.length === 0) {
+                logToConsole("Peringatan HPP: Tidak ada dokumen Order yang dimuat sama sekali. Total HPP akan dianggap 0.", 'warning');
+            } else if (!dfIncome.length || !dfIncome[0].hasOwnProperty(ORDER_ID_COL)) {
+                logToConsole(`Error HPP: Kolom '${ORDER_ID_COL}' tidak ditemukan di sheet Income Dokumen Penghasilan. Tidak dapat menghitung HPP.`, 'error');
+            } else {
+                const incomeOrderIds = new Set(dfIncome.map(row => String(row[ORDER_ID_COL]).trim()).filter(id => id));
+                
+                // Filter all order data to only include orders present in income for this month
+                const mergedOrdersForMonth = allOrderData.filter(orderRow => 
+                    orderRow.hasOwnProperty(ORDER_ID_COL) && incomeOrderIds.has(String(orderRow[ORDER_ID_COL]).trim())
+                );
+
+                if (mergedOrdersForMonth.length === 0) {
+                    logToConsole("Peringatan: Tidak ada Nomor Pesanan yang cocok antara sheet Income dan Dokumen Order (gabungan) untuk bulan ini. HPP diatur ke 0.", 'warning');
+                } else {
+                    for (const row of mergedOrdersForMonth) {
+                        try {
+                            const skuInduk = (row['SKU Induk'] || '').toString().trim();
+                            const namaProduk = (row['Nama Produk'] || '').toString().trim();
+                            const refSku = (row['Nomor Referensi SKU'] || '').toString().trim();
+                            const variasi = (row['Nama Variasi'] || '').toString().trim();
+                            const productKey = `${skuInduk} | ${namaProduk} | ${refSku} | ${variasi}`;
+                            
+                            const kuantitas = parseFloat(row[QUANTITY_COL]) || 0;
+
+                            if (kuantitas > 0) {
+                                totalItemTerjualForBasketSize += kuantitas;
+
+                                const hppProduk = dataHPP[productKey];
+                                if (hppProduk !== undefined) {
+                                    totalHPP += (hppProduk * kuantitas);
+                                } else {
+                                    logToConsole(`Peringatan HPP: HPP tidak ditemukan untuk produk: '${productKey}' (Pesanan: ${row[ORDER_ID_COL]}). Akan dianggap 0 untuk item ini.`, 'warning');
+                                }
+                            } else {
+                                logToConsole(`Peringatan HPP: Kuantitas produk '${productKey}' (Pesanan: ${row[ORDER_ID_COL]}) tidak valid atau nol. Item ini dilewati dari perhitungan HPP/Basket Size.`, 'warning');
+                            }
+                        } catch (e) {
+                            logToConsole(`Peringatan HPP: Gagal memproses baris produk untuk HPP/Kuantitas: ${e.message}. Baris dilewati.`, 'warning');
+                            continue;
+                        }
+                    }
+                }
+            }
+        } else {
+            if (!dataPenghasilan[bulan] || !dataPenghasilan[bulan].income) {
+                logToConsole("Peringatan HPP: Sheet Income tidak tersedia untuk perhitungan HPP berdasarkan pesanan.", 'warning');
+            }
+            if (Object.keys(dataOrder).length === 0) {
+                logToConsole("Peringatan HPP: Tidak ada Dokumen Order yang dimuat untuk perhitungan HPP berdasarkan pesanan.", 'warning');
+            }
+            if (Object.keys(dataHPP).length === 0) {
+                logToConsole("Peringatan HPP: Data HPP belum diisi. Total HPP akan dianggap 0.", 'warning');
+            }
+        }
+
+        const labaKotor = totalPendapatanSummary - totalHPP;
+        const labaBersih = totalPenghasilanIncome - totalHPP - biayaOperasional - biayaIklan;
+
+        const rasioAdminLayanan = totalPendapatanSummary > 0 ? (Math.abs(biayaAdminLayanan) / totalPendapatanSummary) * 100 : 0;
+        const rasioOperasional = totalPendapatanSummary > 0 ? ((biayaOperasional + biayaIklan) / totalPendapatanSummary) * 100 : 0;
+        const aovAktual = jumlahOrderUnikFromIncome > 0 ? totalPenghasilanIncome / jumlahOrderUnikFromIncome : 0;
+        const basketSizeAktual = jumlahOrderUnikFromIncome > 0 ? totalItemTerjualForBasketSize / jumlahOrderUnikFromIncome : 0;
+        const roasAktual = biayaIklan > 0 ? totalPendapatanSummary / biayaIklan : 0;
+        const acosAktual = totalPendapatanSummary > 0 ? (biayaIklan / totalPendapatanSummary) * 100 : 0;
+        const rasioMargin = totalPendapatanSummary > 0 ? (labaKotor / totalPendapatanSummary) * 100 : 0;
+        const rasioLaba = totalPendapatanSummary > 0 ? (labaBersih / totalPendapatanSummary) * 100 : 0;
+
+        const results = {
+            "TOTAL PENDAPATAN": totalPendapatanSummary,
+            "TOTAL PENGHASILAN": totalPenghasilanIncome,
+            "HPP": totalHPP,
+            "OPERASIONAL": biayaOperasional,
+            "IKLAN": biayaIklan,
+            "RASIO ADMIN DAN LAYANAN": rasioAdminLayanan,
+            "RASIO OPERASIONAL": rasioOperasional,
+            "AOV AKTUAL": aovAktual,
+            "BASKET SIZE AKTUAL": basketSizeAktual,
+            "ROAS AKTUAL": roasAktual,
+            "ACOS AKTUAL": acosAktual,
+            "RASIO MARGIN": rasioMargin,
+            "RASIO LABA": rasioLaba,
+            "LABA/RUGI": labaBersih,
+            "STATUS LABA": labaBersih >= 0 ? "LABA" : "RUGI"
+        };
+
+        if (printToConsole) {
+            logToConsole(`    TOTAL PENDAPATAN                     : Rp ${results['TOTAL PENDAPATAN'].toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`);
+            logToConsole(`    TOTAL PENGHASILAN                    : Rp ${results['TOTAL PENGHASILAN'].toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`);
+            logToConsole(`    HPP                                  : Rp ${results['HPP'].toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`);
+            logToConsole(`    OPERASIONAL                          : Rp ${results['OPERASIONAL'].toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`);
+            logToConsole(`    IKLAN                                : Rp ${results['IKLAN'].toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`);
+            logToConsole("    " + "-".repeat(50), 'info');
+
+            logToConsole(`    RASIO ADMIN DAN LAYANAN              : ${results['RASIO ADMIN DAN LAYANAN'].toFixed(2)}%`);
+            logToConsole(`    RASIO OPERASIONAL                    : ${results['RASIO OPERASIONAL'].toFixed(2)}%`);
+            logToConsole(`    AOV AKTUAL                           : Rp ${results['AOV AKTUAL'].toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`);
+            logToConsole(`    BASKET SIZE AKTUAL                   : ${results['BASKET SIZE AKTUAL'].toFixed(2)} item/order`);
+
+            if (results['IKLAN'] > 0) {
+                logToConsole(`    ROAS AKTUAL                          : ${results['ROAS AKTUAL'].toFixed(2)}x`);
+                logToConsole(`    ACOS AKTUAL                          : ${results['ACOS AKTUAL'].toFixed(2)}%`);
+            } else {
+                logToConsole("    ROAS AKTUAL                          : Tidak ada biaya iklan.", 'warning');
+                logToConsole("    ACOS AKTUAL                          : Tidak ada biaya iklan.", 'warning');
+            }
+
+            logToConsole(`    RASIO MARGIN                         : ${results['RASIO MARGIN'].toFixed(2)}%`);
+            logToConsole(`    RASIO LABA                           : ${results['RASIO LABA'].toFixed(2)}%`);
+
+            const profitLossClass = results['LABA/RUGI'] >= 0 ? 'message-success' : 'message-error';
+            logToConsole(`    LABA/RUGI                            : Rp ${results['LABA/RUGI'].toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} (${results['STATUS LABA']})`, profitLossClass);
+            logToConsole("=".repeat(65), 'info');
+        }
+        return results;
+    }
+
+    function displayAnalysisResults(month, results) {
+        const analysisOutputDiv = document.getElementById('analysisOutput');
+        analysisOutputDiv.classList.remove('hidden');
+        
+        let html = `<h3>Analisis Keuangan Bulan ${month.toUpperCase()}</h3>`;
+        html += `<table class="analysis-table">`;
+        html += `<thead><tr><th>Metrik</th><th>Nilai</th></tr></thead><tbody>`;
+
+        const formatCurrency = (value) => `Rp ${value.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        const formatPercentage = (value) => `${value.toFixed(2)}%`;
+        const formatMultiplier = (value) => `${value.toFixed(2)}x`;
+        const formatItemOrder = (value) => `${value.toFixed(2)} item/order`;
+
+        html += `<tr><td>TOTAL PENDAPATAN</td><td>${formatCurrency(results['TOTAL PENDAPATAN'])}</td></tr>`;
+        html += `<tr><td>TOTAL PENGHASILAN</td><td>${formatCurrency(results['TOTAL PENGHASILAN'])}</td></tr>`;
+        html += `<tr><td>HPP</td><td>${formatCurrency(results['HPP'])}</td></tr>`;
+        html += `<tr><td>OPERASIONAL</td><td>${formatCurrency(results['OPERASIONAL'])}</td></tr>`;
+        html += `<tr><td>IKLAN</td><td>${formatCurrency(results['IKLAN'])}</td></tr>`;
+        html += `<tr><td colspan="2"><hr style="border-top: 1px dashed #ccc;"></td></tr>`; // Separator
+
+        html += `<tr><td>RASIO ADMIN DAN LAYANAN</td><td>${formatPercentage(results['RASIO ADMIN DAN LAYANAN'])}</td></tr>`;
+        html += `<tr><td>RASIO OPERASIONAL</td><td>${formatPercentage(results['RASIO OPERASIONAL'])}</td></tr>`;
+        html += `<tr><td>AOV AKTUAL</td><td>${formatCurrency(results['AOV AKTUAL'])}</td></tr>`;
+        html += `<tr><td>BASKET SIZE AKTUAL</td><td>${formatItemOrder(results['BASKET SIZE AKTUAL'])}</td></tr>`;
+        
+        if (results['IKLAN'] > 0) {
+            html += `<tr><td>ROAS AKTUAL</td><td>${formatMultiplier(results['ROAS AKTUAL'])}</td></tr>`;
+            html += `<tr><td>ACOS AKTUAL</td><td>${formatPercentage(results['ACOS AKTUAL'])}</td></tr>`;
+        } else {
+            html += `<tr><td>ROAS AKTUAL</td><td>Tidak ada biaya iklan.</td></tr>`;
+            html += `<tr><td>ACOS AKTUAL</td><td>Tidak ada biaya iklan.</td></tr>`;
+        }
+
+        html += `<tr><td>RASIO MARGIN</td><td>${formatPercentage(results['RASIO MARGIN'])}</td></tr>`;
+        html += `<tr><td>RASIO LABA</td><td>${formatPercentage(results['RASIO LABA'])}</td></tr>`;
+        
+        const profitLossClass = results['LABA/RUGI'] >= 0 ? 'profit-status' : 'loss-status';
+        html += `<tr><td>LABA/RUGI</td><td class="${profitLossClass}">${formatCurrency(results['LABA/RUGI'])} (${results['STATUS LABA']})</td></tr>`;
+        
+        html += `</tbody></table>`;
+        analysisOutputDiv.innerHTML = html;
+    }
+
+    function analyzeAllMonths() {
+        const eligibleMonths = getEligibleMonths();
+        if (eligibleMonths.length === 0) {
+            logToConsole("Belum ada bulan yang memenuhi syarat untuk dianalisis. Harap lengkapi data terlebih dahulu.", 'warning');
+            document.getElementById('analysisOutput').classList.add('hidden');
+            return;
+        }
+        logToConsole("\n--- ANALISIS KEUANGAN UNTUK SEMUA BULAN ---", 'info');
+        
+        let allAnalysisHtml = `<h3>Analisis Keuangan untuk Semua Bulan</h3>`;
+        
+        eligibleMonths.forEach(month => {
+            const results = hitungDanTampilkanMetrik(month, true); // Print to console for each month
+            allAnalysisHtml += `<div style="margin-top: 30px;"></div>`; // Visual separator
+            allAnalysisHtml += `<hr style="border: 1px dashed #ccc; margin-bottom: 20px;">`; // Horizontal rule
+            allAnalysisHtml += `<h4 style="text-align: center; color: #34495e;">Bulan: ${month.toUpperCase()}</h4>`;
+            allAnalysisHtml += `<table class="analysis-table">`;
+            allAnalysisHtml += `<thead><tr><th>Metrik</th><th>Nilai</th></tr></thead><tbody>`;
+
+            const formatCurrency = (value) => `Rp ${value.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            const formatPercentage = (value) => `${value.toFixed(2)}%`;
+            const formatMultiplier = (value) => `${value.toFixed(2)}x`;
+            const formatItemOrder = (value) => `${value.toFixed(2)} item/order`;
+
+            allAnalysisHtml += `<tr><td>TOTAL PENDAPATAN</td><td>${formatCurrency(results['TOTAL PENDAPATAN'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>TOTAL PENGHASILAN</td><td>${formatCurrency(results['TOTAL PENGHASILAN'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>HPP</td><td>${formatCurrency(results['HPP'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>OPERASIONAL</td><td>${formatCurrency(results['OPERASIONAL'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>IKLAN</td><td>${formatCurrency(results['IKLAN'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td colspan="2"><hr style="border-top: 1px dashed #ccc;"></td></tr>`; 
+
+            allAnalysisHtml += `<tr><td>RASIO ADMIN DAN LAYANAN</td><td>${formatPercentage(results['RASIO ADMIN DAN LAYANAN'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>RASIO OPERASIONAL</td><td>${formatPercentage(results['RASIO OPERASIONAL'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>AOV AKTUAL</td><td>${formatCurrency(results['AOV AKTUAL'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>BASKET SIZE AKTUAL</td><td>${formatItemOrder(results['BASKET SIZE AKTUAL'])}</td></tr>`;
+            
+            if (results['IKLAN'] > 0) {
+                allAnalysisHtml += `<tr><td>ROAS AKTUAL</td><td>${formatMultiplier(results['ROAS AKTUAL'])}</td></tr>`;
+                allAnalysisHtml += `<tr><td>ACOS AKTUAL</td><td>${formatPercentage(results['ACOS AKTUAL'])}</td></tr>`;
+            } else {
+                allAnalysisHtml += `<tr><td>ROAS AKTUAL</td><td>Tidak ada biaya iklan.</td></tr>`;
+                allAnalysisHtml += `<tr><td>ACOS AKTUAL</td><td>Tidak ada biaya iklan.</td></tr>`;
+            }
+
+            allAnalysisHtml += `<tr><td>RASIO MARGIN</td><td>${formatPercentage(results['RASIO MARGIN'])}</td></tr>`;
+            allAnalysisHtml += `<tr><td>RASIO LABA</td><td>${formatPercentage(results['RASIO LABA'])}</td></tr>`;
+            
+            const profitLossClass = results['LABA/RUGI'] >= 0 ? 'profit-status' : 'loss-status';
+            allAnalysisHtml += `<tr><td>LABA/RUGI</td><td class="${profitLossClass}">${formatCurrency(results['LABA/RUGI'])} (${results['STATUS LABA']})</td></tr>`;
+            
+            allAnalysisHtml += `</tbody></table>`;
+        });
+        
+        const analysisOutputDiv = document.getElementById('analysisOutput');
+        analysisOutputDiv.classList.remove('hidden');
+        analysisOutputDiv.innerHTML = allAnalysisHtml;
+    }
+
+    function exportReport() {
+        const eligibleMonths = getEligibleMonths();
+        if (eligibleMonths.length === 0) {
+            logToConsole("Belum ada bulan yang memenuhi syarat untuk diekspor.", 'warning');
+            return;
+        }
+
+        const exportChoice = prompt("Pilih opsi ekspor:\n1. Ekspor Laporan Bulan Spesifik\n2. Ekspor Laporan Semua Bulan ke Satu File\n\nMasukkan 1 atau 2:");
+        
+        if (exportChoice === '1') {
+            const monthToExport = prompt("Masukkan bulan yang ingin diekspor (misal: Jan, Feb):");
+            const normalizedMonth = normalizeMonthInput(monthToExport);
+            if (eligibleMonths.includes(normalizedMonth)) {
+                const singleMonthAnalysisData = hitungDanTampilkanMetrik(normalizedMonth, false); // No console print
+                createExcelFile("single", singleMonthAnalysisData, normalizedMonth);
+            } else {
+                logToConsole("Bulan tidak valid atau tidak tersedia untuk analisis. Silakan coba lagi.", 'error');
+            }
+        } else if (exportChoice === '2') {
+            const allMonthsAnalysisData = {};
+            eligibleMonths.forEach(month => {
+                allMonthsAnalysisData[month] = hitungDanTampilkanMetrik(month, false); // No console print
+            });
+            createExcelFile("all", allMonthsAnalysisData);
+        } else {
+            logToConsole("Pilihan ekspor tidak valid.", 'error');
+        }
+    }
+
+    function createExcelFile(exportType, data, monthName = null) {
+        let wb = XLSX.utils.book_new();
+
+        if (exportType === "single") {
+            const ws_data = [
+                ["Metrik", "Nilai"]
+            ];
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let value = data[key];
+                    // Format output for Excel
+                    if (typeof value === 'number') {
+                        if (key.includes("RASIO") || key.includes("ACOS")) {
+                            value = parseFloat(value.toFixed(2)) / 100; // As decimal for percentage format
+                        } else if (key.includes("ROAS")) {
+                            value = parseFloat(value.toFixed(2));
+                        } else if (key.includes("BASKET SIZE")) {
+                            value = parseFloat(value.toFixed(2));
+                        } else {
+                             value = parseFloat(value.toFixed(0));
+                        }
+                    }
+                    ws_data.push([key, value]);
+                }
+            }
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            
+            // Apply formatting for percentages etc.
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+                const cell = ws[XLSX.utils.encode_cell({r:R, c:1})]; // Value column
+                if (!cell || cell.t !== 'n') continue; // Only numbers
+                
+                const metricName = ws[XLSX.utils.encode_cell({r:R, c:0})].v; // Metric name
+                if (metricName.includes("RASIO") || metricName.includes("ACOS")) {
+                    cell.z = '0.00%'; // Percentage format
+                } else if (metricName.includes("ROAS")) {
+                     cell.z = '0.00"x"'; // Custom format for multiplier
+                } else if (metricName.includes("BASKET SIZE")) {
+                     cell.z = '0.00" item/order"'; // Custom format for items/order
+                } else if (metricName.includes("TOTAL") || metricName.includes("HPP") || metricName.includes("OPERASIONAL") || metricName.includes("IKLAN") || metricName.includes("AOV") || metricName.includes("LABA/RUGI")) {
+                    cell.z = '_-"Rp"* #,##0_-;-_-"Rp"* #,##0_-;_-"Rp"* "-"_-;_-@_-'; // Currency without decimal
+                }
+            }
+            
+            XLSX.utils.book_append_sheet(wb, ws, monthName || "Analisis");
+
+        } else if (exportType === "all") {
+            for (const month in data) {
+                if (data.hasOwnProperty(month)) {
+                    const monthData = data[month];
+                    const ws_data = [
+                        ["Metrik", "Nilai"]
+                    ];
+                    for (const key in monthData) {
+                        if (monthData.hasOwnProperty(key)) {
+                             let value = monthData[key];
+                            // Format output for Excel
+                            if (typeof value === 'number') {
+                                if (key.includes("RASIO") || key.includes("ACOS")) {
+                                    value = parseFloat(value.toFixed(2)) / 100; // As decimal for percentage format
+                                } else if (key.includes("ROAS")) {
+                                    value = parseFloat(value.toFixed(2));
+                                } else if (key.includes("BASKET SIZE")) {
+                                    value = parseFloat(value.toFixed(2));
+                                } else {
+                                    value = parseFloat(value.toFixed(0));
+                                }
+                            }
+                            ws_data.push([key, value]);
+                        }
+                    }
+                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                    
+                    // Apply formatting for percentages etc.
+                    const range = XLSX.utils.decode_range(ws['!ref']);
+                    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+                        const cell = ws[XLSX.utils.encode_cell({r:R, c:1})]; // Value column
+                        if (!cell || cell.t !== 'n') continue; // Only numbers
+                        
+                        const metricName = ws[XLSX.utils.encode_cell({r:R, c:0})].v; // Metric name
+                        if (metricName.includes("RASIO") || metricName.includes("ACOS")) {
+                            cell.z = '0.00%'; // Percentage format
+                        } else if (metricName.includes("ROAS")) {
+                             cell.z = '0.00"x"'; // Custom format for multiplier
+                        } else if (metricName.includes("BASKET SIZE")) {
+                             cell.z = '0.00" item/order"'; // Custom format for items/order
+                        } else if (metricName.includes("TOTAL") || metricName.includes("HPP") || metricName.includes("OPERASIONAL") || metricName.includes("IKLAN") || metricName.includes("AOV") || metricName.includes("LABA/RUGI")) {
+                            cell.z = '_-"Rp"* #,##0_-;-_-"Rp"* #,##0_-;_-"Rp"* "-"_-;_-@_-'; // Currency without decimal
+                        }
+                    }
+                    XLSX.utils.book_append_sheet(wb, ws, month);
+                }
+            }
+        }
+
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const filename = exportType === "single" ? `Laporan_Keuangan_${monthName}.xlsx` : "Laporan_Keuangan_Semua_Bulan.xlsx";
+
+        try {
+            saveAs(new Blob([wbout], { type: 'application/octet-stream' }), filename);
+            logToConsole(`Laporan berhasil diekspor sebagai '${filename}'.`, 'success');
+        } catch (e) {
+            logToConsole(`Gagal mengekspor laporan: ${e.message}`, 'error');
+        }
+    }
+
+    // Polyfill for saveAs function (used for file download in browser)
+    function saveAs(blob, filename) {
+        if (typeof navigator.msSaveOrOpenBlob !== 'undefined') {
+            return navigator.msSaveOrOpenBlob(blob, filename);
+        } else if (typeof navigator.appVersion !== 'undefined' && navigator.appVersion.indexOf("MSIE 10") !== -1) {
+            return navigator.msSaveOrOpenBlob(blob, filename);
+        } else {
+            const a = document.createElement('a');
+            a.download = filename;
+            a.href = URL.createObjectURL(blob);
+            a.dataset.downloadurl = ['application/octet-stream', a.download, a.href].join(':');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            return true;
+        }
+    }
+
+    // This function is no longer used for menu item 7 but kept for reference if needed elsewhere
+    function confirmExit() {
+        if (confirm("Apakah Anda yakin ingin keluar dari program?")) {
+            logToConsole("Terima kasih telah menggunakan program ini! Sampai jumpa.", 'info');
+            // Di lingkungan web, "keluar" berarti tidak ada lagi interaksi.
+            // Bisa juga mengarahkan ke halaman kosong atau menonaktifkan semua input.
+            document.querySelector('.container').innerHTML = '<h1>Terima kasih! Program Selesai.</h1><p style="text-align: center;">Anda bisa menutup tab ini.</p>';
+        }
+    }
+
+    // Initialize the first section when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        showSection('inputPenghasilan'); // Or any other default section
+        updateAnalysisMonthSelect(); // Initial update for analysis month dropdown
+        updateIklanMonthSelect(); // Initial update for iklan month dropdown
+        updateOperasionalMonthSelect(); // Initial update for operasional month dropdown
+    });
+</script>
+
+</body>
+</html>
