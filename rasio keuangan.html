@@ -39,13 +39,67 @@
             color: white;
             margin: 0;
         }
-        .menu-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 25px;
-            justify-content: center;
+        
+        /* --- NEW: Menu Toggle & Dropdown Styling --- */
+        .menu-nav-wrapper {
+            position: relative; /* Penting untuk positioning dropdown */
+            width: fit-content; /* Dropdown width will fit content */
+            margin: 0 auto 25px auto; /* Center the toggle button and its dropdown */
         }
+
+        .menu-toggle {
+            background-color: #3498db; /* Blue color for the main MENU button */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            display: block; /* Ensures it takes full width of its parent */
+            width: 100%;
+            text-align: center;
+        }
+
+        .menu-toggle:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .dropdown-content {
+            display: flex; /* Menggunakan flexbox untuk penataan item menu */
+            flex-direction: column; /* Menumpuk item secara vertikal */
+            position: absolute; /* Positioning relatif terhadap .menu-nav-wrapper */
+            background-color: #f9f9f9;
+            min-width: 250px; /* Lebar minimum dropdown */
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 10; /* Pastikan dropdown di atas konten lain */
+            border-radius: 0 0 8px 8px;
+            overflow: hidden; /* Penting untuk transisi max-height */
+            
+            /* Initial state: hidden */
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px); /* Slightly move up for fade-in effect */
+            transition: max-height 0.6s ease-out, opacity 0.4s ease-in, transform 0.4s ease-in; /* Smooth transition */
+        }
+
+        .dropdown-content.show {
+            max-height: 600px; /* Cukup besar untuk menampilkan semua item menu */
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .menu-buttons {
+            display: flex; /* Tetap flex untuk individual button spacing if desired, but flex-direction column below */
+            flex-direction: column; /* Stack buttons vertically within the dropdown */
+            gap: 5px; /* Spasi antar tombol di dropdown */
+            padding: 10px; /* Padding di dalam dropdown */
+        }
+        /* --- END NEW: Menu Toggle & Dropdown Styling --- */
+
         .menu-button, .action-button {
             padding: 12px 20px;
             border: none;
@@ -54,12 +108,13 @@
             font-size: 1rem;
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            flex: 1 1 auto; /* Allows buttons to grow and shrink */
-            max-width: 100%; /* Prevents buttons from becoming too wide on large screens */
+            text-align: left; /* Align text to left for list-like appearance */
         }
         .menu-button {
-            background-color: #2ecc71; /* Green for main menu */
+            background-color: #2ecc71; /* Green for main menu items inside dropdown */
             color: white;
+            width: 100%; /* Make buttons full width inside dropdown */
+            box-sizing: border-box; /* Include padding/border in width */
         }
         .menu-button:hover {
             background-color: #27ae60;
@@ -68,6 +123,7 @@
         .action-button {
             background-color: #3498db; /* Blue for actions */
             color: white;
+            margin-top: 10px; /* Memberikan sedikit jarak dari elemen di atasnya */
         }
         .action-button:hover {
             background-color: #2980b9;
@@ -79,6 +135,10 @@
             border-radius: 8px;
             margin-top: 20px;
             border: 1px solid #ddd;
+            display: none; /* Default hidden */
+        }
+        .input-section.show-content { /* Use a class to show/hide content */
+            display: block;
         }
         .input-section h3 {
             color: #34495e;
@@ -98,26 +158,54 @@
         .form-group input[type="file"],
         .form-group input[type="text"],
         .form-group input[type="number"],
-        .form-group select { /* Added select here */
+        .form-group select { /* Select will also get this width */
             width: calc(100% - 22px); /* Adjust for padding and border */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1rem;
         }
+        /* Removed .analysis-options-group specific styles */
+        /* .analysis-options-group { ... } */
+        /* .analysis-options-group .month-select.analysis-select-item { ... } */
+
         .output-console {
             background-color: #2c3e50;
             color: #ecf0f1;
             padding: 15px;
             border-radius: 5px;
-            max-height: 300px;
-            overflow-y: auto;
-            white-space: pre-wrap; /* Preserve whitespace and break lines */
+            height: 300px; /* Fixed height for the console container */
+            overflow: hidden; /* Hide overflow, inner divs will handle scroll */
             font-family: 'Consolas', 'Courier New', monospace;
             font-size: 0.9rem;
             margin-top: 20px;
             border: 1px solid #1a252f;
+            display: flex; /* Use flexbox for internal layout */
+            flex-direction: column; /* Stack children vertically */
         }
+        /* Removed: Style for initial welcome message to be centered */
+        /* .initial-welcome-message {
+            text-align: center;
+            margin-bottom: 10px;
+        } */
+
+        .output-console .input-summary {
+            flex-grow: 0; /* Don't grow */
+            flex-shrink: 0; /* Don't shrink */
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #555; /* Separator line */
+            margin-bottom: 10px;
+            max-height: 40%; /* Max height for summary */
+            overflow-y: auto; /* Scroll for summary if content is long */
+            white-space: pre-wrap; /* Preserve whitespace and break lines */
+            display: none; /* Hidden by default */
+        }
+        .output-console .process-log {
+            flex-grow: 1; /* Take up remaining space */
+            overflow-y: auto; /* Scroll for logs */
+            white-space: pre-wrap; /* Preserve whitespace and break lines */
+        }
+
         .message-success { color: #2ecc71; }
         .message-info { color: #3498db; }
         .message-warning { color: #f39c12; }
@@ -166,11 +254,12 @@
             color: #e74c3c; /* Red for loss */
             font-weight: bold;
         }
+        /* .hidden is now handled by .input-section display: none, but for elements not affected by showSection, keep .hidden */
         .hidden {
             display: none;
         }
         .month-select {
-            margin-top: 15px;
+            margin-top: 5px; /* Adjust margin here if needed by new flex structure */
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ccc;
@@ -192,21 +281,17 @@
                 margin: 10px;
                 padding: 15px;
             }
-            .menu-buttons {
-                flex-direction: column; /* Stack menu buttons vertically on small screens */
-                align-items: stretch;
+            /* .menu-nav-wrapper tetap di tengah */
+            .dropdown-content {
+                min-width: 90%; /* Lebar dropdown lebih fleksibel di mobile */
             }
-            .menu-button, .action-button {
-                width: 100%; /* Make buttons full width */
-                margin-bottom: 5px; /* Add some space between stacked buttons */
-            }
-            .button-group {
-                flex-direction: column; /* Stack button groups vertically */
-                align-items: stretch; /* Stretch buttons to full width */
-            }
-            .button-group .right-aligned-button {
-                margin-left: 0; /* Remove auto margin when stacked */
-                margin-top: 10px; /* Add spacing if they stack */
+            /* Removed .analysis-options-group specific media query styles */
+            /* .analysis-options-group { ... } */
+            /* .analysis-options-group .month-select.analysis-select-item,
+            .analysis-options-group .action-button { ... } */
+            .month-select { /* Adjust default month select for mobile */
+                width: 100%;
+                margin-top: 5px;
             }
         }
     </style>
@@ -218,22 +303,28 @@
         <h1>📊 Program Rasio Keuangan 📈</h1>
     </div>
 
-    <div class="menu-buttons">
-        <button class="menu-button" onclick="showSection('inputPenghasilan')">1. Input Dokumen Penghasilan</button>
-        <button class="menu-button" onclick="showSection('inputOrder')">2. Input Dokumen Order</button>
-        <button class="menu-button" onclick="showSection('inputIklan')">3. Input Biaya Iklan</button>
-        <button class="menu-button" onclick="showSection('inputHPP')">4. Input HPP Produk</button>
-        <button class="menu-button" onclick="showSection('inputOperasional')">5. Input Biaya Operasional</button>
-        <button class="menu-button" onclick="showSection('analisisKeuangan')">6. Analisis Keuangan</button>
-        <button class="menu-button" onclick="exportReport()">7. Ekspor Laporan</button>
+    <div class="menu-nav-wrapper">
+        <button class="menu-toggle" id="menuToggle">MENU</button>
+        <div class="dropdown-content" id="dropdownMenu">
+            <div class="menu-buttons">
+                <button class="menu-button" onclick="showSection('inputPenghasilan')">1. Input Dokumen Penghasilan</button>
+                <button class="menu-button" onclick="showSection('inputOrder')">2. Input Dokumen Order</button>
+                <button class="menu-button" onclick="showSection('inputIklan')">3. Input Biaya Iklan</button>
+                <button class="menu-button" onclick="showSection('inputHPP')">4. Input HPP Produk</button>
+                <button class="menu-button" onclick="showSection('inputOperasional')">5. Input Biaya Operasional</button>
+                <button class="menu-button" onclick="showSection('analisisKeuangan')">6. Analisis Keuangan</button>
+                <button class="menu-button" onclick="exportReport()">7. Ekspor Laporan</button>
+            </div>
+        </div>
     </div>
-
     <div id="outputConsole" class="output-console">
-        <span class="message-info">Selamat datang di Program Rasio Keuangan berbasis Web!</span><br>
-        <span class="message-info">Pilih menu di atas untuk memulai.</span>
+        <div id="inputSummary" class="input-summary">
+            </div>
+        <div id="processLog" class="process-log">
+            </div>
     </div>
 
-    <div id="inputPenghasilan" class="input-section hidden">
+    <div id="inputPenghasilan" class="input-section">
         <h3>1. Input Dokumen Penghasilan</h3>
         <p>Pilih satu atau beberapa file Excel Dokumen Penghasilan Anda.</p>
         <div class="form-group">
@@ -247,7 +338,7 @@
         <div id="penghasilanProcessingStatus" style="margin-top: 10px;"></div>
     </div>
 
-    <div id="inputOrder" class="input-section hidden">
+    <div id="inputOrder" class="input-section">
         <h3>2. Input Dokumen Order</h3>
         <p>Pilih satu atau beberapa file Excel Dokumen Order Anda.</p>
         <div class="form-group">
@@ -261,7 +352,7 @@
         <div id="orderProcessingStatus" style="margin-top: 10px;"></div>
     </div>
 
-    <div id="inputIklan" class="input-section hidden">
+    <div id="inputIklan" class="input-section">
         <h3>3. Input Biaya Iklan</h3>
         <div class="form-group">
             <label for="iklanMonthSelect">Bulan:</label>
@@ -279,7 +370,7 @@
         </div>
     </div>
 
-    <div id="inputHPP" class="input-section hidden">
+    <div id="inputHPP" class="input-section">
         <h3>4. Input HPP Produk</h3>
         <p>HPP akan diinput berdasarkan produk yang terdeteksi dari Dokumen Order.</p>
         <div class="button-group">
@@ -293,7 +384,7 @@
         </div>
     </div>
 
-    <div id="inputOperasional" class="input-section hidden">
+    <div id="inputOperasional" class="input-section">
         <h3>5. Input Biaya Operasional</h3>
         <div class="form-group">
             <label for="operasionalMonthSelect">Bulan:</label>
@@ -311,7 +402,7 @@
         </div>
     </div>
 
-    <div id="analisisKeuangan" class="input-section hidden">
+    <div id="analisisKeuangan" class="input-section">
         <h3>6. Analisis Keuangan</h3>
         <p>Pilih opsi analisis:</p>
         <div class="form-group">
@@ -319,7 +410,7 @@
             <select id="analysisMonthSelect" class="month-select" onchange="enableSpecificMonthAnalysis()">
                 <option value="">-- Pilih Bulan --</option>
             </select>
-            <button class="action-button" id="analyzeSpecificMonthBtn" onclick="analyzeSpecificMonth()" disabled style="margin-left: 10px;">Lihat Analisis Bulan Ini</button>
+            <button class="action-button" id="analyzeSpecificMonthBtn" onclick="analyzeSpecificMonth()" disabled>Lihat Analisis Bulan Ini</button>
         </div>
         <div class="button-group">
             <button class="action-button" onclick="analyzeAllMonths()">Tampilkan Analisis untuk Semua Bulan</button>
@@ -343,14 +434,15 @@
     const bulanOperasional = [];
 
     let currentSection = ''; // Untuk melacak section yang sedang aktif
+    let hasInputBeenProcessed = false; // Flag untuk melacak apakah ada input yang sudah masuk
 
     // Pemetaan bulan ke angka untuk pengurutan
     const MONTH_ORDER = {
-        'Januari': 1, 'Februari': 2, 'Maret': 3, 'April': 4, 'Mei': 5, 'Juni': 6,
+        'Januari': 1, 'Februari': 2, 'Maret': 3, 'Setu': 4, 'Mei': 5, 'Juni': 6,
         'Juli': 7, 'Agustus': 8, 'September': 9, 'Oktober': 10, 'November': 11, 'Desember': 12
     };
     const REVERSE_MONTH_ORDER = {
-        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April', 5: 'Mei', 6: 'Juni',
+        1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'Setu', 5: 'Mei', 6: 'Juni',
         7: 'Juli', 8: 'Agustus', 9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
     };
 
@@ -359,7 +451,7 @@
         'jan': 'Januari', 'januari': 'Januari',
         'feb': 'Februari', 'februari': 'Februari',
         'mar': 'Maret', 'maret': 'Maret',
-        'apr': 'April', 'april': 'April',
+        'apr': 'Setu', 'setu': 'Setu',
         'mei': 'Mei',
         'jun': 'Juni', 'juni': 'Juni',
         'jul': 'Juli', 'juli': 'Juli',
@@ -373,43 +465,103 @@
     // --- UTILITY FUNCTIONS ---
 
     function logToConsole(message, type = 'info') {
-        const consoleDiv = document.getElementById('outputConsole');
+        const processLogDiv = document.getElementById('processLog');
         const span = document.createElement('span');
         span.className = 'message-' + type;
         span.textContent = message;
-        consoleDiv.appendChild(span);
-        consoleDiv.appendChild(document.createElement('br'));
-        consoleDiv.scrollTop = consoleDiv.scrollHeight; // Scroll to bottom
+        processLogDiv.appendChild(span);
+        processLogDiv.appendChild(document.createElement('br'));
+        processLogDiv.scrollTop = processLogDiv.scrollHeight; // Scroll to bottom
     }
 
+    // --- NEW: Function to update the summary section ---
+    function updateInputSummary() {
+        const inputSummaryDiv = document.getElementById('inputSummary');
+        let summaryHtml = '<span class="message-info">Ringkasan Input:</span><br>';
+        let hasData = false;
+
+        // Penghasilan
+        if (bulanPenghasilan.length > 0) {
+            summaryHtml += `<span class="message-success">Dokumen Penghasilan (Bulan): ${bulanPenghasilan.join(', ')}</span><br>`;
+            hasData = true;
+        }
+
+        // Order
+        if (bulanOrder.length > 0) {
+            summaryHtml += `<span class="message-success">Dokumen Order (Bulan): ${bulanOrder.join(', ')}</span><br>`;
+            hasData = true;
+        }
+
+        // Iklan
+        if (Object.keys(dataIklan).length > 0) {
+            const iklanEntries = Object.entries(dataIklan)
+                                     .sort(([m1], [m2]) => MONTH_ORDER[m1] - MONTH_ORDER[m2])
+                                     .map(([month, nominal]) => `${month}: Rp ${nominal.toLocaleString('id-ID')}`);
+            summaryHtml += `<span class="message-success">Biaya Iklan: ${iklanEntries.join('; ')}</span><br>`;
+            hasData = true;
+        }
+
+        // Operasional
+        if (Object.keys(dataOperasional).length > 0) {
+            const operasionalEntries = Object.entries(dataOperasional)
+                                           .sort(([m1], [m2]) => MONTH_ORDER[m1] - MONTH_ORDER[m2])
+                                           .map(([month, nominal]) => `${month}: Rp ${nominal.toLocaleString('id-ID')}`);
+            summaryHtml += `<span class="message-success">Biaya Operasional: ${operasionalEntries.join('; ')}</span><br>`;
+            hasData = true;
+        }
+
+        // HPP
+        if (Object.keys(dataHPP).length > 0) {
+            const hppCount = Object.keys(dataHPP).length;
+            const hppFilledCount = Object.values(dataHPP).filter(val => val > 0).length;
+            summaryHtml += `<span class="message-success">HPP Produk: ${hppFilledCount} dari ${hppCount} produk sudah diisi.</span><br>`;
+            hasData = true;
+        }
+
+        if (hasData) {
+            inputSummaryDiv.innerHTML = summaryHtml;
+            inputSummaryDiv.style.display = 'block'; // Show the summary section
+            document.getElementById('outputConsole').style.height = '300px'; // Ensure fixed height after split
+            // Clear initial welcome message if it's still there after first input
+            if (!hasInputBeenProcessed) {
+                document.getElementById('processLog').innerHTML = ''; // Clear initial message from processLog
+                hasInputBeenProcessed = true;
+            }
+        } else {
+            inputSummaryDiv.style.display = 'none'; // Keep hidden if no data
+        }
+    }
+    // --- END NEW: updateInputSummary() ---
+
     function showSection(sectionId) {
-        // Sembunyikan semua section input
+        // Hide all sections first
         document.querySelectorAll('.input-section').forEach(section => {
-            section.classList.add('hidden');
+            section.classList.remove('show-content'); // Reverted to show-content
         });
-        // Tampilkan section yang dipilih
-        document.getElementById(sectionId).classList.remove('hidden');
-        currentSection = sectionId;
+
+        // Show the target section
+        const targetSection = document.getElementById(sectionId);
+        targetSection.classList.add('show-content'); // Reverted to show-content
         logToConsole(`Membuka menu: ${sectionId.replace(/([A-Z])/g, ' $1').trim()}...`, 'info');
 
-        // Khusus untuk analisis, perbarui daftar bulan yang tersedia
+        // Update currentSection tracker
+        currentSection = sectionId;
+
+        // Specific updates based on the section being opened
         if (sectionId === 'analisisKeuangan') {
             updateAnalysisMonthSelect();
-        }
-        // Khusus untuk input iklan, perbarui daftar bulan yang tersedia
-        if (sectionId === 'inputIklan') {
+        } else if (sectionId === 'inputIklan') {
             updateIklanMonthSelect();
-        }
-        // Khusus untuk input operasional, perbarui daftar bulan yang tersedia
-        if (sectionId === 'inputOperasional') {
+        } else if (sectionId === 'inputOperasional') {
             updateOperasionalMonthSelect();
-        }
-        // Khusus untuk HPP, pastikan tombol simpan dan next tersembunyi
-        if (sectionId === 'inputHPP') {
+        } else if (sectionId === 'inputHPP') {
             document.getElementById('saveHPPButton').classList.add('hidden');
-            document.getElementById('nextHPPButton').classList.add('hidden'); // Ensure hidden
-            document.getElementById('hppProductList').innerHTML = ''; // Clear previous products
+            document.getElementById('nextHPPButton').classList.add('hidden');
+            document.getElementById('hppProductList').innerHTML = '';
         }
+        
+        // NEW: Close the dropdown menu after a section button is clicked (This part remains)
+        document.getElementById('dropdownMenu').classList.remove('show');
     }
 
     // New function to handle "NEXT" button clicks
@@ -425,7 +577,7 @@
         const currentIndex = sectionOrder.indexOf(currentSectionId);
         if (currentIndex < sectionOrder.length - 1) {
             const nextSectionId = sectionOrder[currentIndex + 1];
-            showSection(nextSectionId);
+            showSection(nextSectionId); // Use showSection for NEXT
         } else {
             logToConsole("Anda sudah berada di menu terakhir (Analisis Keuangan).", 'info');
         }
@@ -644,6 +796,7 @@
         fileInput.value = ''; // Reset file input
         updateIklanMonthSelect(); // Update the iklan month dropdown after processing penghasilan files
         updateOperasionalMonthSelect(); // Update the operasional month dropdown
+        updateInputSummary(); // NEW: Update the summary section
     }
 
     async function processOrderFiles() {
@@ -701,6 +854,7 @@
         }
         logToConsole("Selesai memproses Dokumen Order.", 'info');
         fileInput.value = ''; // Reset file input
+        updateInputSummary(); // NEW: Update the summary section
     }
 
     function updateIklanMonthSelect() {
@@ -744,6 +898,7 @@
         logToConsole(`Biaya iklan ${month} sebesar Rp ${nominalInput.toLocaleString('id-ID')} berhasil disimpan.`, 'success');
         document.getElementById('iklanNominal').value = '0';
         document.getElementById('iklanMonthSelect').value = ''; // Reset dropdown
+        updateInputSummary(); // NEW: Update the summary section
     }
 
     function getUniqueProductsFromAllOrders() {
@@ -823,6 +978,7 @@
 
         document.getElementById('saveHPPButton').classList.remove('hidden');
         document.getElementById('nextHPPButton').classList.remove('hidden'); // Show NEXT button as well
+        updateInputSummary(); // NEW: Update the summary section
     }
 
     function handleHPPInputKeyDown(event, currentInput) {
@@ -858,6 +1014,7 @@
         if (allValid) {
             logToConsole("Semua HPP berhasil disimpan/diperbarui.", 'success');
         }
+        updateInputSummary(); // NEW: Update the summary section
     }
 
     function updateOperasionalMonthSelect() {
@@ -901,6 +1058,7 @@
         logToConsole(`Biaya operasional ${month} sebesar Rp ${nominalInput.toLocaleString('id-ID')} berhasil disimpan.`, 'success');
         document.getElementById('operasionalNominal').value = '0';
         document.getElementById('operasionalMonthSelect').value = ''; // Reset dropdown
+        updateInputSummary(); // NEW: Update the summary section
     }
 
     // --- ANALYSIS FUNCTIONS ---
@@ -1428,12 +1586,29 @@
         }
     }
 
-    // Initialize the first section when the page loads
+    // NEW: Dropdown Menu Toggle Logic
     document.addEventListener('DOMContentLoaded', () => {
-        showSection('inputPenghasilan'); // Or any other default section
+        const menuToggleButton = document.getElementById('menuToggle');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        menuToggleButton.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('show');
+        });
+
+        // Close the dropdown if the user clicks outside of it
+        window.addEventListener('click', (event) => {
+            if (!event.target.matches('.menu-toggle') && !event.target.closest('.dropdown-content')) {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                }
+            }
+        });
+
+        // REMOVED: showSection('inputPenghasilan'); // This line is removed to prevent auto-opening a section
         updateAnalysisMonthSelect(); // Initial update for analysis month dropdown
         updateIklanMonthSelect(); // Initial update for iklan month dropdown
         updateOperasionalMonthSelect(); // Initial update for operasional month dropdown
+        // updateInputSummary() is not called here intentionally, it will be called after first input
     });
 </script>
 
