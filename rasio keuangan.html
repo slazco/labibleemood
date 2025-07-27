@@ -170,52 +170,43 @@
         /* .analysis-options-group .month-select.analysis-select-item { ... } */
 
         .output-console {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            height: 300px; /* Fixed height for the console container */
-            overflow: hidden; /* Hide overflow, inner divs will handle scroll */
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 0.9rem;
-            margin-top: 20px;
-            border: 1px solid #1a252f;
-            display: flex; /* Use flexbox for internal layout */
-            flex-direction: column; /* Stack children vertically */
-        }
-        /* Removed: Style for initial welcome message to be centered */
-        /* .initial-welcome-message {
-            text-align: center;
-            margin-bottom: 10px;
-        } */
-
-        .output-console .input-summary {
-            flex-grow: 0; /* Don't grow */
-            flex-shrink: 0; /* Don't shrink */
-            height: 200px; /* 2/3 of 300px total height */
-            padding-bottom: 10px;
-            border-bottom: 1px dashed #555; /* Separator line */
-            margin-bottom: 10px;
-            overflow-y: auto; /* Scroll for summary if content is long */
-            white-space: pre-wrap; /* Preserve whitespace and break lines */
-            display: none; /* Hidden by default */
-        }
-        .output-console .process-log {
-            flex-grow: 1; /* Take up remaining space (100px or 1/3) */
-            overflow-y: auto; /* Scroll for logs */
-            white-space: pre-wrap; /* Preserve whitespace and break lines */
-            display: flex; /* Enable flex for process log itself */
-            flex-direction: column-reverse; /* Stack from bottom up */
-        }
-        .output-console .process-log > div { /* Apply margin to each message div */
-            margin-bottom: 5px; /* Spacing between lines */
-        }
-
-
-        .message-success { color: #2ecc71; }
-        .message-info { color: #3498db; }
-        .message-warning { color: #f39c12; }
-        .message-error { color: #e74c3c; }
+  background-color: #ffffff;
+  border-left: 6px solid #3498db;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-top: 30px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: 350px;
+  overflow: hidden;
+}
+.output-console .input-summary {
+  flex-grow: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #ccc;
+  margin-bottom: 10px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+.output-console .process-log {
+  flex-grow: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  display: flex;
+  flex-direction: column-reverse;
+}
+.output-console .process-log > div {
+  margin-bottom: 8px;
+}
+.message-success { color: #2ecc71; }
+.message-info { color: #3498db; }
+.message-warning { color: #f39c12; }
+.message-error { color: #e74c3c; }
 
         .analysis-results {
             background-color: #e8f6f3;
@@ -306,7 +297,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>📊 Program Rasio Keuangan 📈</h1>
+        <h1>📊 Rasio Keuangan</h1>
     </div>
 
     <div class="menu-nav-wrapper">
@@ -1620,16 +1611,6 @@
             a.click();
             document.body.removeChild(a);
             return true;
-        }
-    }
-
-    // This function is no longer used for menu item 7 but kept for reference if needed elsewhere
-    function confirmExit() {
-        if (confirm("Apakah Anda yakin ingin keluar dari program?")) {
-            logToConsole("Terima kasih telah menggunakan program ini! Sampai jumpa.", 'info');
-            // Di lingkungan web, "keluar" berarti tidak ada lagi interaksi.
-            // Bisa juga mengarahkan ke halaman kosong atau menonaktifkan semua input.
-            document.querySelector('.container').innerHTML = '<h1>Terima kasih! Program Selesai.</h1><p style="text-align: center;">Anda bisa menutup tab ini.</p>';
         }
     }
 
