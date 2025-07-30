@@ -847,59 +847,106 @@
 
     <script>
         // --- Login Authentication ---
-        const CORRECT_USERNAME = "labibleemood";
-        const CORRECT_PASSWORD = "embhem";
+const CORRECT_USERNAME = "labibleemood";
+const CORRECT_PASSWORD = "embhem";
 
-        function handleLogin() {
-            const usernameInput = document.getElementById("loginUsername").value;
-            const passwordInput = document.getElementById("loginPassword").value;
-            const errorMessage = document.getElementById("errorMessage");
-            const loginContainer = document.getElementById("loginContainer");
-            const adminPanel = document.getElementById("adminPanel");
+function handleLogin() {
+    const usernameInput = document.getElementById("loginUsername").value;
+    const passwordInput = document.getElementById("loginPassword").value;
+    const errorMessage = document.getElementById("errorMessage");
+    const loginContainer = document.getElementById("loginContainer");
+    const adminPanel = document.getElementById("adminPanel");
 
-            if (usernameInput === CORRECT_USERNAME && passwordInput === CORRECT_PASSWORD) {
-                sessionStorage.setItem("isLoggedIn", "true");
-                loginContainer.style.display = "none"; // Hide login form
-                adminPanel.style.display = "flex";    // Show admin panel
-                loadUsers(); // Load users after successful login
-            } else {
-                errorMessage.style.display = "block";
-                setTimeout(() => {
-                    errorMessage.style.display = "none";
-                }, 3000);
-            }
+    if (usernameInput === CORRECT_USERNAME && passwordInput === CORRECT_PASSWORD) {
+        sessionStorage.setItem("isLoggedIn", "true");
+        // Simpan waktu login saat ini
+        const currentTime = new Date().toISOString();
+        sessionStorage.setItem("lastActivityTime", currentTime);
+
+        loginContainer.style.display = "none";
+        adminPanel.style.display = "flex";
+        loadUsers(); // Load users after successful login
+    } else {
+        errorMessage.style.display = "block";
+        setTimeout(() => {
+            errorMessage.style.display = "none";
+        }, 3000);
+    }
+}
+
+// --- Logika Utama Saat Halaman Dimuat (Termasuk Auto-Logout dan Fitur "Enter") ---
+document.addEventListener("DOMContentLoaded", () => {
+    const loginUsernameField = document.getElementById("loginUsername");
+    const loginPasswordField = document.getElementById("loginPassword");
+    const loginContainer = document.getElementById("loginContainer");
+    const adminPanel = document.getElementById("adminPanel");
+
+    // --- Logika Auto-Logout ---
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+    const lastActivityTime = sessionStorage.getItem("lastActivityTime");
+
+    if (isLoggedIn === "true" && lastActivityTime) {
+        const lastActivityDate = new Date(lastActivityTime);
+        const now = new Date();
+        const oneDay = 24 * 60 * 60 * 1000; // 1 hari dalam milidetik
+
+        if (now.getTime() - lastActivityDate.getTime() > oneDay) {
+            // Jika lebih dari 1 hari, otomatis logout
+            sessionStorage.removeItem("isLoggedIn");
+            sessionStorage.removeItem("lastActivityTime");
+            alert("Anda telah logout secara otomatis karena tidak aktif selama lebih dari 1 hari.");
+            location.reload(); // Reload halaman untuk kembali ke form login
+        } else {
+            // Jika masih dalam batas waktu, tampilkan panel admin
+            loginContainer.style.display = "none";
+            adminPanel.style.display = "flex";
+            loadUsers(); // Muat data user
+
+            // Perbarui waktu aktivitas di sessionStorage setiap kali halaman dimuat
+            // Ini akan "mereset" timer jika user kembali ke halaman atau refresh
+            sessionStorage.setItem("lastActivityTime", now.toISOString());
         }
+    } else {
+        // Jika belum login atau tidak ada lastActivityTime, tampilkan form login
+        loginContainer.style.display = "flex";
+        adminPanel.style.display = "none";
+    }
 
-        function logout() {
-            if (confirm("Anda yakin ingin keluar?")) {
-                sessionStorage.removeItem("isLoggedIn");
-                location.reload(); // Reload the page to show login form
-            }
-        }
-
-        // Fitur "Enter" untuk submit form login
-        document.addEventListener("DOMContentLoaded", () => {
-            const loginUsernameField = document.getElementById("loginUsername");
-            const loginPasswordField = document.getElementById("loginPassword");
-
-            if (loginUsernameField) { // Check if elements exist before adding listeners
-                loginUsernameField.addEventListener("keypress", function(event) {
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        loginPasswordField.focus();
-                    }
-                });
-            }
-
-            if (loginPasswordField) {
-                loginPasswordField.addEventListener("keypress", function(event) {
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        handleLogin();
-                    }
-                });
+    // --- Fitur "Enter" untuk submit form login ---
+    if (loginUsernameField) { // Pastikan elemen ada
+        loginUsernameField.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Mencegah submit default
+                loginPasswordField.focus(); // Pindah fokus ke password
             }
         });
+    }
+
+    if (loginPasswordField) { // Pastikan elemen ada
+        loginPasswordField.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Mencegah submit default
+                handleLogin(); // Panggil fungsi login
+            }
+        });
+    }
+});
+
+// Panggil fungsi ini di setiap aksi penting pengguna di panel admin
+function updateSessionActivityTime() {
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+    if (isLoggedIn === "true") {
+        sessionStorage.setItem("lastActivityTime", new Date().toISOString());
+        console.log("Session activity time updated.");
+    }
+}
+
+function logout() {
+    if (confirm("Anda yakin ingin keluar?")) {
+        sessionStorage.removeItem("isLoggedIn");
+        location.reload(); // Reload the page to show login form
+    }
+}
 
         // --- Firebase Admin Panel Logic ---
         const DATABASE_URL = "https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv";
