@@ -1,73 +1,1178 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>By Leemood</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #f7fafc, #e2e8f0);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #2c3e50;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>By Leemood | Panel Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #3498db; /* A vibrant blue */
+            --secondary-color: #2c3e50; /* Dark blue-grey */
+            --accent-color: #2ecc71; /* Brighter green for success/active */
+            --danger-color: #e74c3c; /* Red for delete/inactive */
+            --warning-color: #f39c12; /* Yellow for edit/warning */
+            --info-color: #95a5a6; /* Grey for reset */
+            --background-light: #f4f7f6;
+            --background-gradient-start: #f0f4f8;
+            --background-gradient-end: #d9e2ec;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --button-hover-transform: translateY(-2px);
+            --button-transition: all 0.2s ease-in-out;
+        }
 
-    .container {
-      text-align: center;
-      padding: 40px 20px;
-    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-gradient-start), var(--background-gradient-end));
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex; /* Untuk layout login center */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-    h1 {
-      font-size: 3.5rem;
-      margin-bottom: 30px;
-      font-weight: 700;
-    }
+        /* Styles for Login Container */
+        .login-container {
+            background: var(--card-background);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px var(--shadow-medium);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            display: flex; /* Set to flex to center its content */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Make login container take full height when active */
+            box-sizing: border-box; /* Include padding in height calculation */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      align-items: center;
-    }
+        .login-container h2 {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
 
-    .menu a {
-      background-color: #2c3e50;
-      color: white;
-      padding: 14px 32px;
-      text-decoration: none;
-      border-radius: 12px;
-      font-size: 1.2rem;
-      font-weight: 500;
-      width: 250px;
-      text-align: center;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+            width: 100%; /* Ensure input group takes full width within container */
+        }
 
-    .menu a:hover {
-      background-color: #1f2a38;
-      transform: scale(1.04);
-    }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
 
-    @media (min-width: 600px) {
-      .menu {
-        flex-direction: row;
-      }
-    }
-  </style>
+        .input-group input {
+            width: calc(100% - 24px); /* Full width minus padding */
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-color);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .input-group input::placeholder {
+            color: #ccc;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--button-transition);
+            box-shadow: 0 5px 15px var(--shadow-light);
+            letter-spacing: 0.5px;
+        }
+
+        .login-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow-medium);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: none; /* Hidden by default */
+        }
+
+        /* End Styles for Login Container */
+
+        /* Existing Styles for Admin Panel */
+        .admin-panel {
+            display: none; /* Hidden by default until logged in */
+            width: 100%;
+            flex-grow: 1; /* Allow admin panel to grow and take available space */
+            flex-direction: column; /* Ensure content stacks vertically */
+        }
+
+        .landing {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px 20px;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .menu a {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 28px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            min-width: 180px;
+            text-align: center;
+            transition: var(--button-transition);
+            box-shadow: 0 4px 10px var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu a:hover {
+            background-color: #2980b9;
+            transform: var(--button-hover-transform);
+            box-shadow: 0 6px 15px var(--shadow-medium);
+        }
+
+        .menu a:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 30px auto;
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
+        }
+
+        .admin-panel h2 { /* Targeting only H2 within admin panel */
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--secondary-color);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        /* Modifikasi .form untuk menampung input pencarian dan tombol */
+        .form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: end;
+        }
+
+        .search-group {
+            grid-column: 1 / -1; /* Ambil seluruh lebar */
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-group input {
+            flex-grow: 1; /* Input mengambil sisa ruang */
+            margin-bottom: 0; /* Hapus margin bawah jika ada */
+        }
+        .search-group button {
+            flex-shrink: 0; /* Tombol tidak menyusut */
+            padding: 0.8rem 1.2rem;
+            background-color: var(--info-color); /* Warna yang berbeda untuk tombol cari */
+        }
+        .search-group button:hover {
+            background-color: #7f8c8d;
+        }
+
+
+        .form input::placeholder {
+            color: #aaa;
+        }
+
+        .form input {
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            color: var(--text-color);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .form button {
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--button-transition);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: auto;
+            box-shadow: 0 4px 8px var(--shadow-light);
+        }
+
+        .form button:hover {
+            background-color: #27ae60;
+            transform: var(--button-hover-transform);
+            box-shadow: 0 6px 12px var(--shadow-medium);
+        }
+
+        .form button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+
+        .generated-pass {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background-color: #e6ffe6;
+            border: 1px solid #c6f6d5;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-align: center;
+            grid-column: 1 / -1;
+            word-break: break-all;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--border-color), rgba(0, 0, 0, 0));
+            margin: 2.5rem 0;
+        }
+
+        .table-container {
+            overflow-x: auto; /* Penting untuk tabel di layar kecil, meskipun akan disembunyikan */
+            margin-top: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px var(--shadow-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 700px; /* Pertahankan min-width untuk desktop agar tidak terlalu sempit */
+        }
+
+        th, td {
+            padding: 1rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            word-break: break-word;
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        th:first-child { border-top-left-radius: 10px; }
+        th:last-child { border-top-right-radius: 10px; }
+
+        tr:last-child td { border-bottom: none; }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #eef7ff;
+            transition: background-color 0.2s ease;
+        }
+
+        td button {
+            padding: 0.6rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            transition: var(--button-transition);
+            font-weight: 500;
+            min-width: auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        td button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        td button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        td button:nth-of-type(1) {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        td button:nth-of-type(1):hover { background-color: #2980b9; }
+
+        td button:nth-of-type(2) {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        td button:nth-of-type(2):hover { background-color: #c0392b; }
+
+        td button:nth-of-type(3) {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        td button:nth-of-type(3):hover { background-color: #d39e00; }
+
+        td button:nth-of-type(4) {
+            background-color: var(--info-color);
+            color: white;
+        }
+        td button:nth-of-type(4):hover { background-color: #7f8c8d; }
+
+        /* Styling dasar untuk input tanggal agar terlihat seperti input teks biasa */
+        .form input.flatpickr-input,
+        td input.flatpickr-input,
+        .user-card input.flatpickr-input {
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            color: var(--text-color);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background-color: white;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: none; 
+            padding-right: 0.8rem;
+        }
+
+        .form input.flatpickr-input:focus,
+        td input.flatpickr-input:focus,
+        .user-card input.flatpickr-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        /* Card view for smaller screens (Default: hidden for desktop) */
+        .card-container {
+            display: none; /* Default hidden */
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .user-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: var(--card-background);
+            box-shadow: 0 4px 12px var(--shadow-light);
+            transition: var(--button-transition);
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--shadow-medium);
+        }
+
+        .user-card div {
+            margin-bottom: 0.7rem;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Memastikan konten wrap jika terlalu panjang */
+        }
+
+        .user-card div strong {
+            color: var(--secondary-color);
+            min-width: 90px;
+            flex-shrink: 0;
+            margin-right: 10px; /* Beri sedikit jarak */
+        }
+        
+        .user-card button {
+            margin-top: 10px;
+            width: 100%; /* Tombol ambil lebar penuh di card */
+            font-size: 1rem;
+            padding: 0.8rem;
+            border-radius: 25px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: var(--button-transition);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .user-card button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-card button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .user-card button:first-of-type {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .user-card button:first-of-type:hover { background-color: #2980b9; }
+
+        .user-card button:nth-of-type(2) {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        .user-card button:nth-of-type(2):hover { background-color: #d39e00; }
+
+        .user-card button:nth-of-type(3) {
+            background-color: var(--info-color);
+            color: white;
+        }
+        .user-card button:nth-of-type(3):hover { background-color: #7f8c8d; }
+
+        .user-card button:last-of-type {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .user-card button:last-of-type:hover { background-color: #c0392b; }
+
+
+        .pagination {
+            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pagination button {
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--button-transition);
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pagination button:hover {
+            background-color: #1a252f;
+            transform: var(--button-hover-transform);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .pagination button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .pagination button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        #pageInfo {
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        /* === Flatpickr Theme Customization (Sudah ada dari sebelumnya) === */
+        /* Pastikan gaya ini cukup spesifik jika ingin menimpa bawaan Flatpickr */
+        .flatpickr-calendar {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-medium);
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            z-index: 9999;
+        }
+
+        .flatpickr-months .flatpickr-month {
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-month,
+        .flatpickr-current-month .numInputWrapper {
+            color: white;
+        }
+
+        .flatpickr-prev-month,
+        .flatpickr-next-month {
+            color: white;
+            fill: white;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .flatpickr-prev-month:hover,
+        .flatpickr-next-month:hover {
+            opacity: 1;
+        }
+
+        .flatpickr-weekdays {
+            background: #f0f0f0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .flatpickr-weekday {
+            color: var(--secondary-color);
+            font-weight: 500;
+            padding: 8px 0;
+        }
+
+        .flatpickr-day {
+            color: var(--text-color);
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange,
+        .flatpickr-day.selected.inRange,
+        .flatpickr-day.startRange.endRange {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .flatpickr-day.today {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .flatpickr-day.today:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .flatpickr-day:hover {
+            background: #e9e9e9;
+        }
+
+        .flatpickr-day.disabled,
+        .flatpickr-day.nextMonthDay,
+        .flatpickr-day.prevMonthDay {
+            color: #ccc;
+        }
+
+        .flatpickr-time input.flatpickr-hour,
+        .flatpickr-time input.flatpickr-minute,
+        .flatpickr-time input.flatpickr-second {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        .flatpickr-time .flatpickr-am-pm {
+            color: var(--secondary-color);
+        }
+
+
+        /* --- Responsive adjustments (Bagian KUNCI) --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 0 10px; /* Sedikit padding samping agar tidak terlalu mepet */
+            }
+            .admin-panel h1 { font-size: 2.2rem; margin-bottom: 20px;}
+            .admin-panel h2 { font-size: 1.8rem; margin-bottom: 20px;}
+            .menu { flex-direction: column; gap: 10px; }
+            .menu a { 
+                width: 90%; /* Ambil lebih banyak lebar */
+                max-width: 300px; 
+                margin: 0 auto; /* Posisikan di tengah */
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+            .form { 
+                grid-template-columns: 1fr; /* Semua input jadi satu kolom */
+                gap: 0.8rem;
+            }
+            .form input, .form button { 
+                width: 100%; /* Ambil lebar penuh */
+                box-sizing: border-box; /* Pastikan padding dan border masuk dalam lebar */
+            }
+            .container { 
+                padding: 1.2rem; /* Kurangi padding container */
+                margin: 20px auto; /* Sesuaikan margin */
+                border-radius: 10px;
+            }
+            
+            /* Sembunyikan tabel di layar kecil */
+            .table-container { 
+                display: none; 
+            }
+            /* Tampilkan Card View di layar kecil */
+            .card-container { 
+                display: flex; 
+            }
+
+            .user-card {
+                padding: 1rem; /* Kurangi padding card */
+                border-radius: 10px;
+            }
+            .user-card div {
+                font-size: 0.95rem; /* Ukuran font lebih kecil di card */
+                flex-direction: column; /* Label dan value jadi vertikal */
+                align-items: flex-start; /* Rata kiri */
+                margin-bottom: 0.5rem;
+            }
+            .user-card div strong {
+                min-width: unset; /* Hapus min-width */
+                margin-right: 0;
+                margin-bottom: 5px; /* Beri jarak antar label dan value */
+            }
+            /* Menyesuaikan input tanggal di dalam card agar mengambil lebar penuh */
+            .user-card input.flatpickr-input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .user-card button {
+                padding: 0.7rem;
+                font-size: 0.95rem;
+                border-radius: 20px;
+                margin-bottom: 5px; /* Jarak antar tombol di card */
+            }
+            .pagination {
+                gap: 10px; /* Kurangi jarak antar elemen paginasi */
+            }
+            .pagination button { 
+                padding: 0.6rem 1.2rem; 
+                font-size: 0.9rem; 
+            }
+            #pageInfo { font-size: 0.95rem; }
+
+            /* Atur input pencarian agar selalu 100% lebar di mobile */
+            .search-group {
+                flex-direction: column; /* Input dan tombol jadi vertikal di mobile */
+                gap: 0.8rem;
+            }
+            .search-group input, .search-group button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                width: 95%;
+            }
+            .login-container h2 {
+                font-size: 1.8rem;
+                margin-bottom: 25px;
+            }
+            .input-group input {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+            .login-button {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .admin-panel h1 { font-size: 1.8rem; }
+            .admin-panel h2 { font-size: 1.5rem; }
+            .container { padding: 1rem; margin: 15px auto; }
+            .user-card { padding: 0.8rem; }
+            .user-card div { font-size: 0.85rem; }
+            .user-card button { font-size: 0.85rem; padding: 0.6rem; border-radius: 18px; }
+            .pagination button { padding: 0.5rem 1rem; font-size: 0.85rem; }
+            #pageInfo { font-size: 0.95rem; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>By Leemood</h1>
-    <div class="menu">
-      <a href="kalkulator roas.html">📈 Kalkulator ROAS</a>
-      <a href="rasio keuangan.html">💰 Rasio Keuangan</a>
+    <div class="login-container" id="loginContainer">
+        <h2>Login Admin</h2>
+        <div class="input-group">
+            <label for="loginUsername">Username</label>
+            <input type="text" id="loginUsername" placeholder="Masukkan Username" autocomplete="username">
+        </div>
+        <div class="input-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Masukkan Password" autocomplete="current-password">
+        </div>
+        <button class="login-button" onclick="handleLogin()">Login</button>
+        <p id="errorMessage" class="error-message">Username atau password salah!</p>
     </div>
-  </div>
+
+    <div class="admin-panel" id="adminPanel">
+        <div class="landing">
+            <h1>By Leemood</h1>
+            <div class="menu">
+                <a href="kalkulator roas.html">📈 Kalkulator ROAS</a>
+                <a href="rasio keuangan.html">💰 Rasio Keuangan</a>
+                <button onclick="logout()" style="background-color: var(--danger-color); color: white; border: none; padding: 12px 28px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; min-width: 180px; text-align: center; transition: var(--button-transition); box-shadow: 0 4px 10px var(--shadow-light);">Logout</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <h2>Panel Admin Firebase</h2>
+            <div class="form">
+                <input type="text" id="username" placeholder="Username" />
+                <input type="text" id="expire" class="flatpickr-input" placeholder="Pilih Tanggal Expired" readonly="readonly" />
+                <button onclick="tambahUser()">➕ Tambah User</button>
+                <div id="passwordResult" class="generated-pass"></div>
+                <div class="search-group">
+                    <input type="text" id="searchUser" placeholder="Cari Username atau Password..." />
+                    <button onclick="searchUsers()">🔍 Cari</button>
+                </div>
+            </div>
+            <hr />
+            <div class="users">
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Username</th><th>Password</th><th>Status</th><th>Expire</th><th>Aksi</th></tr></thead>
+                        <tbody id="userBody"></tbody>
+                    </table>
+                </div>
+                <div class="card-container" id="cardBody"></div>
+                <div class="pagination">
+                    <button onclick="prevPage()">⬅ Sebelumnya</button>
+                    <span id="pageInfo">Halaman 1</span>
+                    <button onclick="nextPage()">Berikutnya ➡</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
+    <script>
+        // --- Login Authentication ---
+        const CORRECT_USERNAME = "labibleemood";
+        const CORRECT_PASSWORD = "Embhem10";
+
+        function handleLogin() {
+            const usernameInput = document.getElementById("loginUsername").value;
+            const passwordInput = document.getElementById("loginPassword").value;
+            const errorMessage = document.getElementById("errorMessage");
+            const loginContainer = document.getElementById("loginContainer");
+            const adminPanel = document.getElementById("adminPanel");
+
+            if (usernameInput === CORRECT_USERNAME && passwordInput === CORRECT_PASSWORD) {
+                sessionStorage.setItem("isLoggedIn", "true");
+                loginContainer.style.display = "none"; // Hide login form
+                adminPanel.style.display = "flex";    // Show admin panel
+                loadUsers(); // Load users after successful login
+            } else {
+                errorMessage.style.display = "block";
+                setTimeout(() => {
+                    errorMessage.style.display = "none";
+                }, 3000);
+            }
+        }
+
+        function logout() {
+            if (confirm("Anda yakin ingin keluar?")) {
+                sessionStorage.removeItem("isLoggedIn");
+                location.reload(); // Reload the page to show login form
+            }
+        }
+
+        // Fitur "Enter" untuk submit form login
+        document.addEventListener("DOMContentLoaded", () => {
+            const loginUsernameField = document.getElementById("loginUsername");
+            const loginPasswordField = document.getElementById("loginPassword");
+
+            if (loginUsernameField) { // Check if elements exist before adding listeners
+                loginUsernameField.addEventListener("keypress", function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        loginPasswordField.focus();
+                    }
+                });
+            }
+
+            if (loginPasswordField) {
+                loginPasswordField.addEventListener("keypress", function(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        handleLogin();
+                    }
+                });
+            }
+        });
+
+        // --- Firebase Admin Panel Logic ---
+        const DATABASE_URL = "https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv";
+        let allUsers = []; 
+        let displayedUsers = []; 
+        let currentPage = 1;
+        const perPage = 50;
+
+        function generatePassword(length = 8) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        }
+
+        function tambahUser() {
+            const username = document.getElementById("username").value.trim();
+            const expire = document.getElementById("expire").value; 
+
+            if (!username || !expire) {
+                alert("Username dan tanggal expired wajib diisi.");
+                return;
+            }
+            const password = generatePassword();
+            const data = {};
+            data[username] = { password, active: true, expire };
+
+            fetch(DATABASE_URL, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Gagal menambahkan user ke Firebase.');
+                }
+                document.getElementById("passwordResult").textContent = `Password untuk '${username}' adalah: ${password}`;
+                document.getElementById("username").value = ''; 
+                document.getElementById("expire").value = ''; 
+                loadUsers(); 
+            })
+            .catch(error => {
+                console.error("Error adding user:", error);
+                alert("❌ Gagal menambahkan user: " + error.message);
+            });
+        }
+
+        function loadUsers() {
+            fetch(DATABASE_URL)
+                .then(res => res.json())
+                .then(data => {
+                    allUsers = Object.entries(data || {}); 
+                    searchUsers(); 
+                })
+                .catch(error => {
+                    console.error("Error loading users:", error);
+                    alert("❌ Gagal memuat daftar user.");
+                });
+        }
+
+        function searchUsers() {
+            const searchTerm = document.getElementById("searchUser").value.toLowerCase();
+            
+            displayedUsers = allUsers.filter(([username, info]) => {
+                const userMatch = username.toLowerCase().includes(searchTerm);
+                const passwordMatch = (info.password || "").toLowerCase().includes(searchTerm); 
+                return userMatch || passwordMatch;
+            });
+
+            currentPage = 1; 
+            renderUsers(); 
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById("userBody");
+            const cbody = document.getElementById("cardBody");
+            tbody.innerHTML = "";
+            cbody.innerHTML = "";
+            
+            const start = (currentPage - 1) * perPage;
+            const pageUsers = displayedUsers.slice(start, start + perPage); 
+
+            pageUsers.forEach(([user, info]) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${user}</td>
+                    <td>${info.password || "-"}</td>
+                    <td>${info.active ? "✅ Aktif" : "⛔ Nonaktif"}</td>
+                    <td><input type="text" class="flatpickr-input" value="${info.expire}" data-user="${user}" readonly="readonly" /></td>
+                    <td>
+                        <button onclick="toggleStatus('${user}', ${info.active})" style="background-color: ${info.active ? 'var(--primary-color)' : 'var(--accent-color)'};">${info.active ? "Nonaktifkan" : "Aktifkan"}</button>
+                        <button onclick="hapusUser('${user}')">🗑️</button>
+                        <button onclick="editPassword('${user}')">✏️</button>
+                        <button onclick="resetDevice('${user}')">🔁</button>
+                    </td>`;
+                tbody.appendChild(tr);
+
+                const card = document.createElement("div");
+                card.className = "user-card";
+                card.innerHTML = `
+                    <div><strong>Username:</strong> <span>${user}</span></div>
+                    <div><strong>Password:</strong> <span>${info.password || "-"}</span></div>
+                    <div><strong>Status:</strong> <span>${info.active ? "✅ Aktif" : "⛔ Nonaktif"}</span></div>
+                    <div><strong>Expired:</strong> <input type="text" class="flatpickr-input" value="${info.expire}" data-user="${user}" readonly="readonly" /></div>
+                    <button onclick="toggleStatus('${user}', ${info.active})" style="background-color: ${info.active ? 'var(--primary-color)' : 'var(--accent-color)'};">${info.active ? "Nonaktifkan" : "Aktifkan"}</button>
+                    <button onclick="editPassword('${user}')">✏️ Edit Password</button>
+                    <button onclick="resetDevice('${user}')">🔁 Reset Device</button>
+                    <button onclick="hapusUser('${user}')">🗑️ Hapus</button>`;
+                cbody.appendChild(card);
+            });
+
+            document.getElementById("pageInfo").textContent = `Halaman ${currentPage} dari ${Math.ceil(displayedUsers.length / perPage)}`; 
+
+            document.querySelector('.pagination button:first-child').disabled = currentPage === 1;
+            document.querySelector('.pagination button:last-child').disabled = currentPage === Math.ceil(displayedUsers.length / perPage);
+
+            initializeFlatpickrInstances();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderUsers();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < Math.ceil(displayedUsers.length / perPage)) {
+                currentPage++;
+                renderUsers();
+            }
+        }
+
+        function updateField(user, field, value) {
+            const update = {};
+            update[user] = {};
+            update[user][field] = value;
+
+            fetch(DATABASE_URL, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(update)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Gagal memperbarui data user.');
+                }
+                console.log(`User ${user} field ${field} updated to ${value}`);
+                loadUsers(); 
+            })
+            .catch(error => {
+                console.error(`Error updating field ${field} for user ${user}:`, error);
+                alert(`❌ Gagal memperbarui ${field} untuk user ${user}: ` + error.message);
+            });
+        }
+
+        function toggleStatus(user, currentStatus) {
+            fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`)
+                .then(res => res.json())
+                .then(data => {
+                    data.active = !currentStatus;
+                    fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    }).then(() => loadUsers())
+                    .catch(error => alert("❌ Gagal mengubah status user: " + error.message));
+                })
+                .catch(error => alert("❌ Gagal mengambil data user untuk mengubah status: " + error.message));
+        }
+
+        function hapusUser(user) {
+            if (!confirm(`Yakin ingin menghapus user '${user}'?`)) return;
+            fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
+                method: "DELETE"
+            }).then(() => loadUsers())
+            .catch(error => alert("❌ Gagal menghapus user: " + error.message));
+        }
+
+        function editPassword(user) {
+            const newPass = prompt("Masukkan password baru:");
+            if (!newPass) return;
+            
+            fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`)
+                .then(res => res.json())
+                .then(data => {
+                    data.password = newPass;
+                    fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    }).then(() => loadUsers())
+                    .catch(error => alert("❌ Gagal memperbarui password: " + error.message));
+                })
+                .catch(error => alert("❌ Gagal mengambil data user untuk memperbarui password: " + error.message));
+        }
+
+        function resetDevice(user) {
+            if (!confirm(`Yakin ingin me-reset device user '${user}'? Ini akan menghasilkan password baru.`)) return;
+
+            const newPassword = generatePassword(); // Generate a new password
+            fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`)
+                .then(res => res.json())
+                .then(data => {
+                    data.password = newPassword; // Update password
+                    // You might also want to set active: true if resetting implies reactivation
+                    data.active = true; 
+                    fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    }).then(() => {
+                        alert(`Password untuk user '${user}' telah direset menjadi: ${newPassword}`);
+                        loadUsers();
+                    })
+                    .catch(error => alert("❌ Gagal mereset device: " + error.message));
+                })
+                .catch(error => alert("❌ Gagal mengambil data user untuk mereset device: " + error.message));
+        }
+
+
+        // --- Flatpickr (Date Picker) Initialization ---
+        function initializeFlatpickrInstances() {
+            flatpickr("#expire", {
+                locale: "id",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                enableTime: false,
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (instance.element.id === "expire") {
+                        // This is the "add user" expire field, no specific user context needed
+                        console.log("New user expire date set to:", dateStr);
+                    }
+                }
+            });
+
+            // Initialize Flatpickr for existing users' expire dates
+            document.querySelectorAll('input.flatpickr-input[data-user]').forEach(input => {
+                flatpickr(input, {
+                    locale: "id",
+                    dateFormat: "Y-m-d",
+                    minDate: "today",
+                    enableTime: false,
+                    onChange: function(selectedDates, dateStr, instance) {
+                        const user = instance.element.dataset.user;
+                        if (user) {
+                            updateField(user, 'expire', dateStr);
+                        }
+                    }
+                });
+            });
+        }
+
+        // --- Initial Load Logic (Check Login Status) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+            const loginContainer = document.getElementById("loginContainer");
+            const adminPanel = document.getElementById("adminPanel");
+
+            if (isLoggedIn === "true") {
+                loginContainer.style.display = "none";
+                adminPanel.style.display = "flex"; // Show as flex to maintain layout
+                loadUsers(); // Load user data if already logged in
+            } else {
+                loginContainer.style.display = "flex"; // Show login form
+                adminPanel.style.display = "none";    // Hide admin panel
+            }
+
+            // Event listener for search input Enter key
+            document.getElementById("searchUser").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    searchUsers();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
