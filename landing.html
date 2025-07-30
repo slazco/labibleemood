@@ -894,7 +894,9 @@ document.addEventListener("DOMContentLoaded", () => {
             // Jika lebih dari 1 hari, otomatis logout
             sessionStorage.removeItem("isLoggedIn");
             sessionStorage.removeItem("lastActivityTime");
-            alert("Anda telah logout secara otomatis karena tidak aktif selama lebih dari 1 hari.");
+            // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+            // alert("Anda telah logout secara otomatis karena tidak aktif selama lebih dari 1 hari.");
+            console.log("Anda telah logout secara otomatis karena tidak aktif selama lebih dari 1 hari.");
             location.reload(); // Reload halaman untuk kembali ke form login
         } else {
             // Jika masih dalam batas waktu, tampilkan panel admin
@@ -965,7 +967,9 @@ function logout() {
             const expire = document.getElementById("expire").value; 
 
             if (!username || !expire) {
-                alert("Username dan tanggal expired wajib diisi.");
+                // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                // alert("Username dan tanggal expired wajib diisi.");
+                console.log("Username dan tanggal expired wajib diisi.");
                 return;
             }
             const password = generatePassword();
@@ -988,7 +992,9 @@ function logout() {
             })
             .catch(error => {
                 console.error("Error adding user:", error);
-                alert("❌ Gagal menambahkan user: " + error.message);
+                // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                // alert("❌ Gagal menambahkan user: " + error.message);
+                console.log("❌ Gagal menambahkan user: " + error.message);
             });
         }
 
@@ -1001,7 +1007,9 @@ function logout() {
                 })
                 .catch(error => {
                     console.error("Error loading users:", error);
-                    alert("❌ Gagal memuat daftar user.");
+                    // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                    // alert("❌ Gagal memuat daftar user.");
+                    console.log("❌ Gagal memuat daftar user.");
                 });
         }
 
@@ -1097,11 +1105,18 @@ function logout() {
             })
             .catch(error => {
                 console.error(`Error updating field ${field} for user ${user}:`, error);
-                alert(`❌ Gagal memperbarui ${field} untuk user ${user}: ` + error.message);
+                // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                // alert(`❌ Gagal memperbarui ${field} untuk user ${user}: ` + error.message);
+                console.log(`❌ Gagal memperbarui ${field} untuk user ${user}: ` + error.message);
             });
         }
 
         function toggleStatus(user, currentStatus) {
+            // Tambahkan pop-up konfirmasi di sini
+            if (!confirm(`Anda yakin ingin ${currentStatus ? 'menonaktifkan' : 'mengaktifkan'} user '${user}'?`)) {
+                return; // Jika pengguna membatalkan, hentikan fungsi
+            }
+
             fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`)
                 .then(res => res.json())
                 .then(data => {
@@ -1111,9 +1126,17 @@ function logout() {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(data)
                     }).then(() => loadUsers())
-                    .catch(error => alert("❌ Gagal mengubah status user: " + error.message));
+                    .catch(error => {
+                        // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                        // alert("❌ Gagal mengubah status user: " + error.message);
+                        console.log("❌ Gagal mengubah status user: " + error.message);
+                    });
                 })
-                .catch(error => alert("❌ Gagal mengambil data user untuk mengubah status: " + error.message));
+                .catch(error => {
+                    // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                    // alert("❌ Gagal mengambil data user untuk mengubah status: " + error.message);
+                    console.log("❌ Gagal mengambil data user untuk mengubah status: " + error.message);
+                });
         }
 
         function hapusUser(user) {
@@ -1121,7 +1144,11 @@ function logout() {
             fetch(`https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users/${user}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
                 method: "DELETE"
             }).then(() => loadUsers())
-            .catch(error => alert("❌ Gagal menghapus user: " + error.message));
+            .catch(error => {
+                // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                // alert("❌ Gagal menghapus user: " + error.message);
+                console.log("❌ Gagal menghapus user: " + error.message);
+            });
         }
 
         function editPassword(user) {
@@ -1137,9 +1164,17 @@ function logout() {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(data)
                     }).then(() => loadUsers())
-                    .catch(error => alert("❌ Gagal memperbarui password: " + error.message));
+                    .catch(error => {
+                        // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                        // alert("❌ Gagal memperbarui password: " + error.message);
+                        console.log("❌ Gagal memperbarui password: " + error.message);
+                    });
                 })
-                .catch(error => alert("❌ Gagal mengambil data user untuk memperbarui password: " + error.message));
+                .catch(error => {
+                    // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                    // alert("❌ Gagal mengambil data user untuk memperbarui password: " + error.message);
+                    console.log("❌ Gagal mengambil data user untuk memperbarui password: " + error.message);
+                });
         }
 
         function resetDevice(user) {
@@ -1157,12 +1192,22 @@ function logout() {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(data)
                     }).then(() => {
-                        alert(`Password untuk user '${user}' telah direset menjadi: ${newPassword}`);
+                        // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                        // alert(`Password untuk user '${user}' telah direset menjadi: ${newPassword}`);
+                        console.log(`Password untuk user '${user}' telah direset menjadi: ${newPassword}`);
                         loadUsers();
                     })
-                    .catch(error => alert("❌ Gagal mereset device: " + error.message));
+                    .catch(error => {
+                        // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                        // alert("❌ Gagal mereset device: " + error.message);
+                        console.log("❌ Gagal mereset device: " + error.message);
+                    });
                 })
-                .catch(error => alert("❌ Gagal mengambil data user untuk mereset device: " + error.message));
+                .catch(error => {
+                    // Mengganti alert() dengan custom modal atau pesan di UI jika diperlukan
+                    // alert("❌ Gagal mengambil data user untuk mereset device: " + error.message);
+                    console.log("❌ Gagal mengambil data user untuk mereset device: " + error.message);
+                });
         }
 
 
