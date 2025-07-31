@@ -1,1596 +1,1076 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Program Rasio Keuangan by Leemood</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>By Leemood | Panel Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
     <style>
-        /* Custom CSS for finer control and animations */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #e0f2f7, #c1e7f0); /* Soft blue gradient */
-            color: #333;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-y: auto; /* Allow scrolling if content overflows */
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 20px; /* More rounded corners */
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); /* Stronger shadow */
-            padding: 3rem; /* More padding */
-            width: 100%;
-            max-width: 960px; /* Slightly wider */
-            display: flex;
-            flex-direction: column;
-            gap: 2rem; /* More space between sections */
-            animation: fadeInScale 0.6s ease-out;
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #95a5a6;
+            --background-light: #f4f7f6;
+            --background-gradient-start: #f0f4f8;
+            --background-gradient-end: #d9e2ec;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --button-hover-transform: translateY(-2px);
+            --button-transition: all 0.2s ease-in-out;
         }
 
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-gradient-start), var(--background-gradient-end));
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: var(--card-background);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px var(--shadow-medium);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-container h2 {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-color);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .input-group input::placeholder {
+            color: #ccc;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--button-transition);
+            box-shadow: 0 5px 15px var(--shadow-light);
+            letter-spacing: 0.5px;
+        }
+
+        .login-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow-medium);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        .admin-panel {
+            display: none;
+            width: 100%;
+            flex-grow: 1;
+            flex-direction: column;
+        }
+
+        .landing {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px 20px;
+            flex-direction: column;
+            text-align: center;
         }
 
         h1 {
-            font-size: 3rem; /* Larger title */
+            font-size: 3rem;
+            margin-bottom: 25px;
             font-weight: 700;
-            color: #2c3e50; /* Darker blue-grey */
-            text-align: center;
-            margin-bottom: 2rem;
-            letter-spacing: -0.05em; /* Tighter letter spacing */
+            color: var(--secondary-color);
+            letter-spacing: -0.5px;
         }
-        h2 {
-            font-size: 2rem; /* Larger section titles */
+
+        .menu {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .menu a {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 28px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
             font-weight: 600;
-            color: #34495e;
-            margin-bottom: 1.5rem;
-            border-bottom: 3px solid #e0e0e0; /* Thicker border */
-            padding-bottom: 0.75rem;
+            min-width: 180px;
+            text-align: center;
+            transition: var(--button-transition);
+            box-shadow: 0 4px 10px var(--shadow-light);
             position: relative;
+            overflow: hidden;
         }
-        h2::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -3px;
-            width: 80px; /* Accent underline */
-            height: 3px;
-            background-color: #3498db; /* Primary color accent */
+
+        .menu a:hover {
+            background-color: #2980b9;
+            transform: var(--button-hover-transform);
+            box-shadow: 0 6px 15px var(--shadow-medium);
         }
-        .input-section, .analysis-section {
-            background-color: #fcfcfc;
-            border: 1px solid #e0e0e0;
-            border-radius: 15px; /* More rounded */
-            padding: 2rem; /* More padding */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08); /* Softer shadow */
+
+        .menu a:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--shadow-light);
         }
-        .form-group {
-            margin-bottom: 1.25rem; /* More spacing */
+
+        .container {
+            max-width: 960px;
+            margin: 30px auto;
+            background: var(--card-background);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--shadow-medium);
         }
-        label {
-            display: block;
-            margin-bottom: 0.6rem; /* More spacing */
-            font-weight: 600; /* Bolder labels */
-            color: #444;
-            font-size: 0.95rem;
+
+        .admin-panel h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--secondary-color);
+            font-size: 2rem;
+            font-weight: 600;
         }
-        input[type="file"], input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 0.9rem; /* More padding */
-            border: 1px solid #d1d5db; /* Lighter border */
-            border-radius: 10px; /* Rounded inputs */
+
+        .form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: end;
+        }
+
+        .search-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-group input {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+        .search-group button {
+            flex-shrink: 0;
+            padding: 0.8rem 1.2rem;
+            background-color: var(--info-color);
+        }
+        .search-group button:hover {
+            background-color: #7f8c8d;
+        }
+
+
+        .form input::placeholder {
+            color: #aaa;
+        }
+
+        .form input {
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
             font-size: 1rem;
-            color: #333;
-            transition: all 0.3s ease-in-out;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            color: var(--text-color);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        input[type="file"]:focus, input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3); /* Stronger focus ring */
+
+        .form input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
             outline: none;
         }
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 1rem 2rem; /* More padding */
-            border: none;
-            border-radius: 10px; /* Rounded buttons */
-            font-size: 1.05rem; /* Slightly larger font */
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother transition */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            display: inline-flex; /* For icon alignment */
-            align-items: center;
-            justify-content: center;
-            gap: 8px; /* Space for icon */
-        }
-        button:hover {
-            background-color: #2980b9;
-            transform: translateY(-3px); /* Lift effect */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-            opacity: 0.7;
-            transform: none;
-            box-shadow: none;
-        }
-        .message {
-            margin-top: 1.25rem; /* More spacing */
-            padding: 1rem; /* More padding */
+
+        .form button {
+            padding: 0.8rem;
             border-radius: 8px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            border: none;
+            background-color: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--button-transition);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: auto;
+            box-shadow: 0 4px 8px var(--shadow-light);
         }
-        .message.success {
+
+        .form button:hover {
+            background-color: #27ae60;
+            transform: var(--button-hover-transform);
+            box-shadow: 0 6px 12px var(--shadow-medium);
+        }
+
+        .form button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px var(--shadow-light);
+        }
+
+        .generated-pass {
+            margin-top: 1rem;
+            padding: 0.8rem;
             background-color: #e6ffe6;
-            color: #27ae60;
             border: 1px solid #c6f6d5;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-align: center;
+            grid-column: 1 / -1;
+            word-break: break-all;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-        .message.error {
-            background-color: #ffe6e6;
-            color: #e74c3c;
-            border: 1px solid #f6c6c6;
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--border-color), rgba(0, 0, 0, 0));
+            margin: 2.5rem 0;
         }
-        .message.info {
-            background-color: #e0f2f7;
-            color: #3498db;
-            border: 1px solid #b3e0f2;
-        }
+
         .table-container {
             overflow-x: auto;
-            margin-top: 2rem; /* More spacing */
-            border-radius: 12px; /* Rounded table container */
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            margin-top: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px var(--shadow-light);
         }
+
         table {
             width: 100%;
-            border-collapse: separate; /* For rounded corners */
+            border-collapse: separate;
             border-spacing: 0;
-            min-width: 700px; /* Ensure table is wide enough */
+            min-width: 700px;
         }
+
         th, td {
-            padding: 1rem 1.2rem; /* More padding */
+            padding: 1rem 0.8rem;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--border-color);
+            word-break: break-word;
         }
+
         th {
-            background-color: #2c3e50;
+            background-color: var(--secondary-color);
             color: white;
             font-weight: 600;
             position: sticky;
             top: 0;
             z-index: 1;
         }
-        th:first-child { border-top-left-radius: 12px; }
-        th:last-child { border-top-right-radius: 12px; }
-        tbody tr:last-child td { border-bottom: none; } /* Remove bottom border for last row */
+
+        th:first-child { border-top-left-radius: 10px; }
+        th:last-child { border-top-right-radius: 10px; }
+
+        tr:last-child td { border-bottom: none; }
+
         tbody tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+
         tbody tr:hover {
             background-color: #eef7ff;
             transition: background-color 0.2s ease;
         }
-        .login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+
+        td button {
+            padding: 0.6rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            transition: var(--button-transition);
+            font-weight: 500;
+            min-width: auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        td button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        td button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        td button:nth-of-type(1) {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        td button:nth-of-type(1):hover { background-color: #2980b9; }
+
+        td button:nth-of-type(2) {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        td button:nth-of-type(2):hover { background-color: #c0392b; }
+
+        td button:nth-of-type(3) {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        td button:nth-of-type(3):hover { background-color: #d39e00; }
+
+        td button:nth-of-type(4) {
+            background-color: var(--info-color);
+            color: white;
+        }
+        td button:nth-of-type(4):hover { background-color: #7f8c8d; }
+
+        .form input.flatpickr-input,
+        td input.flatpickr-input,
+        .user-card input.flatpickr-input {
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            color: var(--text-color);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background-color: white;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: none; 
+            padding-right: 0.8rem;
+        }
+
+        .form input.flatpickr-input:focus,
+        td input.flatpickr-input:focus,
+        .user-card input.flatpickr-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+        .card-container {
+            display: none;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .user-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: var(--card-background);
+            box-shadow: 0 4px 12px var(--shadow-light);
+            transition: var(--button-transition);
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px var(--shadow-medium);
+        }
+
+        .user-card div {
+            margin-bottom: 0.7rem;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .user-card div strong {
+            color: var(--secondary-color);
+            min-width: 90px;
+            flex-shrink: 0;
+            margin-right: 10px;
+        }
+        
+        .user-card button {
+            margin-top: 10px;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.75); /* Darker overlay */
+            font-size: 1rem;
+            padding: 0.8rem;
+            border-radius: 25px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: var(--button-transition);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .user-card button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-card button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .user-card button:first-of-type {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .user-card button:first-of-type:hover { background-color: #2980b9; }
+
+        .user-card button:nth-of-type(2) {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        .user-card button:nth-of-type(2):hover { background-color: #d39e00; }
+
+        .user-card button:nth-of-type(3) {
+            background-color: var(--info-color);
+            color: white;
+        }
+        .user-card button:nth-of-type(3):hover { background-color: #7f8c8d; }
+
+        .user-card button:last-of-type {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .user-card button:last-of-type:hover { background-color: #c0392b; }
+
+
+        .pagination {
+            text-align: center;
+            margin-top: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease-out;
+            gap: 15px;
         }
-        .login-box {
-            background-color: white;
-            padding: 3rem; /* More padding */
-            border-radius: 15px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-            text-align: center;
-            width: 90%;
-            max-width: 450px; /* Slightly wider */
-            animation: slideIn 0.4s ease-out;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .login-box h2 {
-            font-size: 2.2rem; /* Larger title */
-            margin-bottom: 2rem;
-            color: #2c3e50;
-            border-bottom: none; /* Remove border for login box title */
-            padding-bottom: 0;
-        }
-        .login-box label {
-            text-align: left;
-            width: 100%;
+
+        .pagination button {
+            padding: 0.7rem 1.5rem;
             font-size: 1rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--button-transition);
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        .login-box input {
-            margin-bottom: 1.5rem; /* More spacing */
+
+        .pagination button:hover {
+            background-color: #1a252f;
+            transform: var(--button-hover-transform);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
-        .login-box button {
-            width: 100%;
-            padding: 1rem; /* Consistent button padding */
+
+        .pagination button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .pagination button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        #pageInfo {
+            font-weight: 600;
+            color: var(--secondary-color);
             font-size: 1.1rem;
         }
-        .hidden {
-            display: none !important;
-        }
-        .flex-col-gap {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem; /* Consistent gap for form groups */
-        }
-        .file-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        .file-input-group input[type="file"] {
-            padding: 0.75rem; /* Adjust padding for file input */
-        }
-        .processing-indicator {
-            display: inline-block;
-            margin-left: 10px;
-            font-size: 0.9em;
-            color: #555;
-        }
-        /* Icons for messages */
-        .message .icon {
-            font-size: 1.2em;
-            line-height: 1;
-        }
-        .message.success .icon { color: #27ae60; }
-        .message.error .icon { color: #e74c3c; }
-        .message.info .icon { color: #3498db; }
 
-        /* Responsive Adjustments */
+        .flatpickr-calendar {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-medium);
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            z-index: 9999;
+        }
+
+        .flatpickr-months .flatpickr-month {
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-month,
+        .flatpickr-current-month .numInputWrapper {
+            color: white;
+        }
+
+        .flatpickr-prev-month,
+        .flatpickr-next-month {
+            color: white;
+            fill: white;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .flatpickr-prev-month:hover,
+        .flatpickr-next-month:hover {
+            opacity: 1;
+        }
+
+        .flatpickr-weekdays {
+            background: #f0f0f0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .flatpickr-weekday {
+            color: var(--secondary-color);
+            font-weight: 500;
+            padding: 8px 0;
+        }
+
+        .flatpickr-day {
+            color: var(--text-color);
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange,
+        .flatpickr-day.selected.inRange,
+        .flatpickr-day.startRange.endRange {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .flatpickr-day.today {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .flatpickr-day.today:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .flatpickr-day.disabled,
+        .flatpickr-day.nextMonthDay,
+        .flatpickr-day.prevMonthDay {
+            color: #ccc;
+        }
+
+        .flatpickr-time input.flatpickr-hour,
+        .flatpickr-time input.flatpickr-minute,
+        .flatpickr-time input.flatpickr-second {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        .flatpickr-time .flatpickr-am-pm {
+            color: var(--secondary-color);
+        }
+
+
         @media (max-width: 768px) {
             body {
-                padding: 10px;
+                padding: 0 10px;
             }
-            .container {
-                padding: 1.5rem;
-                border-radius: 15px;
-                gap: 1.5rem;
+            .admin-panel h1 { font-size: 2.2rem; margin-bottom: 20px;}
+            .admin-panel h2 { font-size: 1.8rem; margin-bottom: 20px;}
+            .menu { flex-direction: column; gap: 10px; }
+            .menu a { 
+                width: 90%;
+                max-width: 300px; 
+                margin: 0 auto;
+                font-size: 1rem;
+                padding: 10px 20px;
             }
-            h1 {
-                font-size: 2.2rem;
-                margin-bottom: 1.5rem;
+            .form { 
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
             }
-            h2 {
-                font-size: 1.6rem;
-                margin-bottom: 1rem;
-                padding-bottom: 0.5rem;
+            .form input, .form button { 
+                width: 100%;
+                box-sizing: border-box;
             }
-            .input-section, .analysis-section {
+            .container { 
                 padding: 1.2rem;
-                border-radius: 12px;
-            }
-            label {
-                font-size: 0.9rem;
-                margin-bottom: 0.4rem;
-            }
-            input[type="file"], input[type="text"], input[type="number"], select {
-                padding: 0.7rem;
-                font-size: 0.95rem;
-                border-radius: 8px;
-            }
-            button {
-                padding: 0.8rem 1.2rem;
-                font-size: 0.95rem;
-                border-radius: 8px;
-            }
-            .message {
-                padding: 0.8rem;
-                font-size: 0.9rem;
-            }
-            th, td {
-                padding: 0.7rem 0.9rem;
-                font-size: 0.85rem;
-            }
-            .login-box {
-                padding: 2rem;
+                margin: 20px auto;
                 border-radius: 10px;
             }
-            .login-box h2 {
-                font-size: 1.8rem;
-                margin-bottom: 1.5rem;
+            
+            .table-container { 
+                display: none; 
             }
-            .login-box input {
-                margin-bottom: 1rem;
+            .card-container { 
+                display: flex; 
+            }
+
+            .user-card {
+                padding: 1rem;
+                border-radius: 10px;
+            }
+            .user-card div {
+                font-size: 0.95rem;
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 0.5rem;
+            }
+            .user-card div strong {
+                min-width: unset;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            .user-card input.flatpickr-input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .user-card button {
+                padding: 0.7rem;
+                font-size: 0.95rem;
+                border-radius: 20px;
+                margin-bottom: 5px;
+            }
+            .pagination {
+                gap: 10px;
+            }
+            .pagination button { 
+                padding: 0.6rem 1.2rem; 
+                font-size: 0.9rem; 
+            }
+            #pageInfo { font-size: 0.95rem; }
+
+            .search-group {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .search-group input, .search-group button {
+                width: 100%;
+                box-sizing: border-box;
             }
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 1rem;
-                gap: 1rem;
+            .login-container {
+                padding: 30px 20px;
+                width: 95%;
             }
-            h1 {
+            .login-container h2 {
                 font-size: 1.8rem;
-                margin-bottom: 1rem;
+                margin-bottom: 25px;
             }
-            h2 {
-                font-size: 1.3rem;
-                margin-bottom: 0.8rem;
-                padding-bottom: 0.4rem;
+            .input-group input {
+                padding: 10px;
+                font-size: 0.95rem;
             }
-            h2::after {
-                width: 60px;
+            .login-button {
+                padding: 12px;
+                font-size: 1rem;
             }
-            .input-section, .analysis-section {
-                padding: 1rem;
-            }
-            label {
-                font-size: 0.85rem;
-            }
-            input[type="file"], input[type="text"], input[type="number"], select {
-                padding: 0.6rem;
-                font-size: 0.9rem;
-                border-radius: 6px;
-            }
-            button {
-                padding: 0.7rem 1rem;
-                font-size: 0.9rem;
-                border-radius: 6px;
-                gap: 5px;
-            }
-            .message {
-                padding: 0.6rem;
-                font-size: 0.85rem;
-                gap: 8px;
-            }
-            th, td {
-                padding: 0.5rem 0.7rem;
-                font-size: 0.8rem;
-            }
-            .login-box {
-                padding: 1.5rem;
-            }
-            .login-box h2 {
-                font-size: 1.5rem;
-                margin-bottom: 1rem;
-            }
+
+            .admin-panel h1 { font-size: 1.8rem; }
+            .admin-panel h2 { font-size: 1.5rem; }
+            .container { padding: 1rem; margin: 15px auto; }
+            .user-card { padding: 0.8rem; }
+            .user-card div { font-size: 0.85rem; }
+            .user-card button { font-size: 0.85rem; padding: 0.6rem; border-radius: 18px; }
+            .pagination button { padding: 0.5rem 1rem; font-size: 0.85rem; }
+            #pageInfo { font-size: 0.95rem; }
         }
     </style>
 </head>
 <body>
-    <div id="appContainer" class="container hidden">
-        <h1>Program Rasio Keuangan</h1>
+    <div class="login-container" id="loginContainer">
+        <h2>Login Admin</h2>
+        <div class="input-group">
+            <label for="loginUsername">Username</label>
+            <input type="text" id="loginUsername" placeholder="Masukkan Username" autocomplete="username">
+        </div>
+        <div class="input-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Masukkan Password" autocomplete="current-password">
+        </div>
+        <button class="login-button" onclick="handleLogin()">Login</button>
+        <p id="errorMessage" class="error-message">Username atau password salah!</p>
+    </div>
 
-        <div class="input-section">
-            <h2>Input Data</h2>
-            <div class="flex-col-gap">
-                <div class="form-group file-input-group">
-                    <label for="penghasilanFileInput">Dokumen Penghasilan (Excel):</label>
-                    <input type="file" id="penghasilanFileInput" accept=".xlsx" multiple onchange="handleFileInput('penghasilan')">
-                    <div id="penghasilanStatus" class="message info hidden"></div>
-                </div>
-
-                <div class="form-group file-input-group">
-                    <label for="orderFileInput">Dokumen Order (Excel):</label>
-                    <input type="file" id="orderFileInput" accept=".xlsx" multiple onchange="handleFileInput('order')">
-                    <div id="orderStatus" class="message info hidden"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="iklanInputMonth">Biaya Iklan (Bulan):</label>
-                    <select id="iklanInputMonth" class="mb-2">
-                        <option value="">Pilih Bulan</option>
-                    </select>
-                    <label for="iklanInputAmount">Nominal Biaya Iklan (Rp):</label>
-                    <input type="number" id="iklanInputAmount" placeholder="Contoh: 1500000" class="mb-2">
-                    <button onclick="inputBiaya('iklan')">
-                        <span class="text-lg">💸</span> Simpan Biaya Iklan
-                    </button>
-                    <div id="iklanStatus" class="message info hidden"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="operasionalInputMonth">Biaya Operasional (Bulan):</label>
-                    <select id="operasionalInputMonth" class="mb-2">
-                        <option value="">Pilih Bulan</option>
-                    </select>
-                    <label for="operasionalInputAmount">Nominal Biaya Operasional (Rp):</label>
-                    <input type="number" id="operasionalInputAmount" placeholder="Contoh: 500000" class="mb-2">
-                    <button onclick="inputBiaya('operasional')">
-                        <span class="text-lg">🏢</span> Simpan Biaya Operasional
-                    </button>
-                    <div id="operasionalStatus" class="message info hidden"></div>
-                </div>
-
-                <div class="form-group">
-                    <button onclick="inputHPPProduk()" id="hppButton">
-                        <span class="text-lg">🏷️</span> Input HPP Produk (Stok Barang)
-                    </button>
-                    <div id="hppStatus" class="message info hidden"></div>
-                </div>
-            </div>
-            <div class="form-group mt-8">
-                <button onclick="resetAllData()" class="bg-red-500 hover:bg-red-600">
-                    <span class="text-lg">🗑️</span> Reset Semua Data
-                </button>
+    <div class="admin-panel" id="adminPanel">
+        <div class="landing">
+            <h1>By Leemood</h1>
+            <div class="menu">
+                <a href="kalkulator roas.html">📈 Kalkulator ROAS</a>
+                <a href="rasio keuangan.html">💰 Rasio Keuangan</a>
+                <button onclick="logout()" style="background-color: var(--danger-color); color: white; border: none; padding: 12px 28px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; min-width: 180px; text-align: center; transition: var(--button-transition); box-shadow: 0 4px 10px var(--shadow-light);">Logout</button>
             </div>
         </div>
 
-        <div class="analysis-section">
-            <h2>Analisis Keuangan</h2>
-            <div class="flex-col-gap">
-                <div class="form-group">
-                    <label for="analysisMonthSelect">Pilih Bulan untuk Analisis Detail:</label>
-                    <select id="analysisMonthSelect">
-                        <option value="">Pilih Bulan</option>
-                    </select>
-                    <button onclick="displaySingleMonthAnalysis()" id="analyzeButton" disabled>
-                        <span class="text-lg">🔍</span> Tampilkan Analisis Detail
-                    </button>
-                </div>
-                <div class="form-group">
-                    <button onclick="displayAllMonthsSummary()" id="summaryButton" disabled>
-                        <span class="text-lg">📈</span> Tampilkan Ringkasan Semua Bulan
-                    </button>
-                </div>
-                <div class="form-group">
-                    <button onclick="exportReports()" id="exportButton" disabled>
-                        <span class="text-lg">💾</span> Ekspor Laporan ke Excel
-                    </button>
+        <div class="container">
+            <h2>Admin Firebase</h2>
+            <div class="form">
+                <input type="text" id="usernameInput" placeholder="Nama Pengguna" />
+                <input type="text" id="expire" class="flatpickr-input" placeholder="Pilih Tanggal Expired" readonly="readonly" />
+                <button onclick="tambahUser()">➕ Tambah Pengguna</button>
+                <div id="generatedLicenseCode" class="generated-pass"></div>
+                <div class="search-group">
+                    <input type="text" id="searchUser" placeholder="Cari Nama Pengguna atau Kode Lisensi..." />
+                    <button onclick="searchUsers()">🔍 Cari</button>
                 </div>
             </div>
-            <div id="analysisOutput" class="table-container hidden"></div>
+            <hr />
+            <div class="users">
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Nama Pengguna</th><th>Kode Lisensi</th><th>Status</th><th>Expired</th><th>Aksi</th></tr></thead>
+                        <tbody id="userBody"></tbody>
+                    </table>
+                </div>
+                <div class="card-container" id="cardBody"></div>
+                <div class="pagination">
+                    <button onclick="prevPage()">⬅ Sebelumnya</button>
+                    <span id="pageInfo">Halaman 1</span>
+                    <button onclick="nextPage()">Berikutnya ➡</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- License/Login Overlay -->
-    <div id="licenseOverlay" class="login-overlay">
-        <div class="login-box">
-            <h2>Verifikasi Lisensi</h2>
-            <div class="form-group">
-                <label for="licenseInput">Kode Lisensi:</label>
-                <input type="text" id="licenseInput" placeholder="Masukkan Kode Lisensi Anda">
-            </div>
-            <button onclick="verifyLicense()">Verifikasi</button>
-            <div id="licenseMessage" class="message hidden"></div>
-            <p class="text-gray-500 text-sm mt-4">Percobaan sisa: <span id="attemptsLeft">3</span></p>
-        </div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
 
     <script>
 (function() {
-    // Firebase Configuration and Secret Key (Base64 encoded)
-    const _fb_s_b64 = "RkF5UWx6ZzVYMDFUc2NTVTY2U0oyVmFTYkI4aTk2ZVZLOHF0T0VXdg=="; // Your Firebase Secret Key
-    const _fb_b_b64 = "aHR0cHM6Ly9yYXNpb2tldWFuZ2FuLWI0Yzg4LWRlZmF1bHQtcnRkYi5hc2lhLXNvdXRoZWFzdDEuZmlyZWJhc2VkYXRhYmFzZS5hcHA="; // Your Firebase Base URL
+    const _u_b64 = "bGFiaWJsZWVtb29k";
+    const _p_b64 = "ZW1iaGVt";
 
-    // Decode Base64 strings
-    const _atob = (str) => {
-        try { return atob(str); } catch (e) { console.error("Base64 decoding error:", e); return ""; }
-    };
-    const _fb_s = _atob(_fb_s_b64);
-    const _fb_b = _atob(_fb_b_b64);
-    const _fb_licenses_url_base = `${_fb_b}/licenses.json?auth=${_fb_s}`;
+    // Fungsi untuk decode Base64
+    function _atob(str) {
+        try {
+            return atob(str);
+        } catch (e) {
+            console.error("Base64 decoding error:", e);
+            return ""; // Return empty string on error
+        }
+    }
 
-    // Global Data Storage
-    let _data_penghasilan = {}; // Key: Month (e.g., 'Jan'), Value: { Summary: DataFrame, Income: DataFrame, income_col_name: string }
-    let _data_order = {};       // Key: Month (e.g., 'Jan'), Value: DataFrame
-    let _data_iklan = {};       // Key: Month (e.g., 'Jan'), Value: number
-    let _data_operasional = {}; // Key: Month (e.g., 'Jan'), Value: number
-    let _data_hpp = {};         // Key: ProductKey, Value: number
+    const _u = _atob(_u_b64); // Decode username
+    const _p = _atob(_p_b64); // Decode password
 
-    // Track months with data
-    let _bulan_penghasilan = [];
-    let _bulan_order = [];
-    let _bulan_iklan = [];
-    let _bulan_operasional = [];
+    const _u_db = "https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/users.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv";
+    const _l_db = "https://rasiokeuangan-b4c88-default-rtdb.asia-southeast1.firebasedatabase.app/licenses";
+    let _a = []; let _d = []; let _c = 1; const _pp = 50;
 
-    // Obfuscated month mappings
-    const _mo = {
-        'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'Mei': 5, 'Jun': 6,
-        'Jul': 7, 'Agu': 8, 'Sep': 9, 'Okt': 10, 'Nov': 11, 'Des': 12
-    };
-    const _rmo = Object.fromEntries(Object.entries(_mo).map(([k, v]) => [v, k]));
-    const _min = {
-        'jan': 'Jan', 'januari': 'Jan', 'feb': 'Feb', 'februari': 'Feb',
-        'mar': 'Mar', 'maret': 'Mar', 'apr': 'Apr', 'april': 'Apr',
-        'mei': 'Mei', 'jun': 'Jun', 'juni': 'Jun', 'jul': 'Jul', 'juli': 'Jul',
-        'agu': 'Agu', 'agustus': 'Agu', 'sep': 'Sep', 'september': 'Sep',
-        'okt': 'Okt', 'oktober': 'Okt', 'nov': 'Nov', 'november': 'Nov',
-        'des': 'Des', 'desember': 'Des'
-    };
-    const _fmn = {
-        'Jan': 'JANUARI', 'Feb': 'FEBRUARI', 'Mar': 'MARET', 'Apr': 'APRIL', 'Mei': 'MEI', 'Jun': 'JUNI',
-        'Jul': 'JULI', 'Agu': 'AGUSTUS', 'Sep': 'SEPTEMBER', 'Okt': 'OKTOBER', 'Nov': 'NOVEMBER', 'Des': 'DESEMBER'
-    };
+    // Anti-debugging: Infinite loop if debugger is open
+    // This is a basic form and can be bypassed.
+    // console.log("Debugging check active.");
+    // const _ad = new Date();
+    // setInterval(() => {
+    //     if (new Date() - _ad > 100) {
+    //         // debugger; // Uncommenting this will trigger debugger if open
+    //     }
+    // }, 1000);
 
-    const _scm = {
-        "TOTAL PENDAPATAN (SUMMARY)": "PENDAPATAN", "TOTAL PENGHASILAN (INCOME)": "PENGHASILAN",
-        "HPP": "HPP", "BIAYA OPERASIONAL": "OPERASIONAL", "BIAYA IKLAN": "IKLAN",
-        "LABA KOTOR": "LABA KOTOR", "LABA BERSIH": "LABA BERSIH",
-        "RASIO ADMIN & LAYANAN": "ADM & LYN %", "RASIO OPERASIONAL": "OPS %",
-        "AOV AKTUAL": "AOV", "BASKET SIZE AKTUAL": "BASKET SIZE",
-        "ROAS AKTUAL": "ROAS", "ACOS AKTUAL": "ACOS", "RASIO MARGIN": "MARGIN %",
-        "RASIO LABA": "LABA %", "STATUS LABA": "STATUS"
-    };
+    // Anti-debugging: Check console state (less reliable)
+    // const _co = console;
+    // Object.defineProperty(_co, 'log', {
+    //     get: function() {
+    //         if (arguments.callee.caller && arguments.callee.caller.toString().indexOf('debugger') !== -1) {
+    //             // debugger;
+    //         }
+    //         return _co.log;
+    //     }
+    // });
 
-    const ORDER_ID_COL = "No. Pesanan";
-    const QUANTITY_COL = "Jumlah";
-    const PRODUCT_IDENTIFIER_COLS = ["SKU Induk", "Nama Produk", "Nomor Referensi SKU", "Nama Variasi"];
-
-    // --- License Verification Logic ---
-    let _attempts_left = 3;
-    const _license_cache_key = "rk_license_code";
-    const _device_id_key = "rk_device_id";
-
-    function _get_device_id() {
-        let deviceId = localStorage.getItem(_device_id_key);
-        if (!deviceId) {
-            deviceId = uuid.v4(); // Generate a unique ID
-            localStorage.setItem(_device_id_key, deviceId);
-            console.log("[DEBUG] Generated new device ID:", deviceId);
+    function _hL() {
+        const uI = document.getElementById("loginUsername").value;
+        const pI = document.getElementById("loginPassword").value;
+        const eM = document.getElementById("errorMessage");
+        const lC = document.getElementById("loginContainer");
+        const aP = document.getElementById("adminPanel");
+        if (uI === _u && pI === _p) {
+            sessionStorage.setItem("isLoggedIn", "true");
+            sessionStorage.setItem("lastActivityTime", new Date().toISOString());
+            lC.style.display = "none";
+            aP.style.display = "flex";
+            _lU();
         } else {
-            console.log("[DEBUG] Reusing existing device ID:", deviceId);
-        }
-        return deviceId;
-    }
-
-    async function _check_license_validity(licenseCode, currentDeviceId) {
-        if (!licenseCode) { return { isValid: false, message: "Kode lisensi tidak boleh kosong." }; }
-
-        try {
-            const res = await fetch(`${_fb_b}/licenses/${licenseCode}.json?auth=${_fb_s}`);
-            if (!res.ok) {
-                if (res.status === 401) {
-                    return { isValid: false, message: "Secret Key Firebase tidak valid atau kadaluarsa." };
-                }
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            const licenseInfo = await res.json();
-            console.log("[DEBUG] License info from Firebase before linking:", licenseInfo);
-
-
-            if (!licenseInfo) { return { isValid: false, message: `Lisensi '${licenseCode}' tidak ditemukan.` }; }
-            if (!licenseInfo.active) { return { isValid: false, message: `Lisensi '${licenseCode}' tidak aktif. Hubungi administrator.` }; }
-
-            const expireDateStr = licenseInfo.expire;
-            if (!expireDateStr) { return { isValid: false, message: `Tanggal kadaluarsa lisensi '${licenseCode}' tidak ditemukan. Hubungi administrator.` }; }
-
-            const expireDate = new Date(expireDateStr);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normalize today's date
-
-            if (expireDate < today) { return { isValid: false, message: `Lisensi '${licenseCode}' telah kadaluarsa pada ${expireDateStr}. Hubungi administrator.` }; }
-
-            const linkedDeviceId = licenseInfo.device_id;
-            if (linkedDeviceId && linkedDeviceId !== currentDeviceId) {
-                return { isValid: false, message: `Lisensi '${licenseCode}' sudah digunakan di perangkat lain.` };
-            }
-
-            return { isValid: true, message: `Lisensi '${licenseCode}' valid.`, licenseInfo: licenseInfo };
-
-        } catch (e) {
-            return { isValid: false, message: `Terjadi error saat memverifikasi lisensi: ${e.message}` };
+            eM.style.display = "block";
+            setTimeout(() => { eM.style.display = "none"; }, 3000);
         }
     }
 
-    async function _is_device_id_linked_to_other_active_license(currentDeviceId, excludingLicenseCode = null) {
-        try {
-            const res = await fetch(_fb_licenses_url_base);
-            if (!res.ok) { throw new Error(`HTTP error! status: ${res.status}`); }
-            const allLicensesData = await res.json();
+    document.addEventListener("DOMContentLoaded", () => {
+        const lUF = document.getElementById("loginUsername");
+        const lPF = document.getElementById("loginPassword");
+        const lC = document.getElementById("loginContainer");
+        const aP = document.getElementById("adminPanel");
+        const iL = sessionStorage.getItem("isLoggedIn");
+        const lAT = sessionStorage.getItem("lastActivityTime");
 
-            if (!allLicensesData) { return false; }
-
-            for (const licenseCode in allLicensesData) {
-                if (licenseCode === excludingLicenseCode) { continue; }
-                const info = allLicensesData[licenseCode];
-                if (info && info.active && info.device_id === currentDeviceId) {
-                    return true;
-                }
+        if (iL === "true" && lAT) {
+            const lAD = new Date(lAT);
+            const n = new Date();
+            const oD = 24 * 60 * 60 * 1000;
+            if (n.getTime() - lAD.getTime() > oD) {
+                sessionStorage.removeItem("isLoggedIn");
+                sessionStorage.removeItem("lastActivityTime");
+                location.reload();
+            } else {
+                lC.style.display = "none";
+                aP.style.display = "flex";
+                _lU();
+                sessionStorage.setItem("lastActivityTime", n.toISOString());
             }
-            return false;
-        } catch (e) {
-            console.error("Error checking other licenses:", e);
-            return true; // Assume linked for safety if error occurs
+        } else {
+            lC.style.display = "flex";
+            aP.style.display = "none";
+        }
+
+        if (lUF) { lUF.addEventListener("keypress", function(e) { if (e.key === "Enter") { e.preventDefault(); lPF.focus(); } }); }
+        if (lPF) { lPF.addEventListener("keypress", function(e) { if (e.key === "Enter") { e.preventDefault(); _hL(); } }); }
+        document.getElementById("searchUser").addEventListener("keypress", function(e) { if (e.key === "Enter") { _sU(); } });
+    });
+
+    function _uSAT() {
+        if (sessionStorage.getItem("isLoggedIn") === "true") {
+            sessionStorage.setItem("lastActivityTime", new Date().toISOString());
         }
     }
 
-    async function _link_license_to_device(licenseCode, deviceId) {
-        console.log(`[DEBUG] Attempting to link license '${licenseCode}' to device '${deviceId}'`);
-        try {
-            const updateUrl = `${_fb_b}/licenses/${licenseCode}.json?auth=${_fb_s}`;
-            const payload = { device_id: deviceId };
-            const res = await fetch(updateUrl, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+    function _l() {
+        if (confirm("Anda yakin ingin keluar?")) {
+            sessionStorage.removeItem("isLoggedIn");
+            location.reload();
+        }
+    }
+
+    function _gALC(l=16) {
+        const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let r = '';
+        for (let i = 0; i < l; i++) { r += c.charAt(Math.floor(Math.random() * c.length)); }
+        return r;
+    }
+
+    function _tU() {
+        const uN = document.getElementById("usernameInput").value.trim();
+        const eD = document.getElementById("expire").value;
+        if (!uN || !eD) { console.log("Nama Pengguna dan Tanggal Expired wajib diisi."); return; }
+        if (_a.some(([n, i]) => n === uN)) {
+            document.getElementById("generatedLicenseCode").textContent = `❌ Nama Pengguna '${uN}' sudah ada.`; return;
+        }
+        const lC = _gALC();
+        const uD = {}; uD[uN] = { license_code: lC, active: true, expire: eD };
+        fetch(_u_db, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(uD) })
+        .then(r => {
+            if (!r.ok) { throw new Error('Gagal menambahkan pengguna ke Firebase.'); }
+            document.getElementById("generatedLicenseCode").textContent = `Kode Lisensi untuk '${uN}' adalah: ${lC}`;
+            document.getElementById("usernameInput").value = ''; document.getElementById("expire").value = '';
+            const lD = { active: true, expire: eD, device_id: null };
+            return fetch(`${_l_db}/${lC}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
+                method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(lD)
             });
-            if (!res.ok) {
-                const errorResponse = await res.text(); // Get raw text for more info
-                console.error(`[ERROR] Failed to link license '${licenseCode}' to device '${deviceId}'. HTTP Status: ${res.status}. Response:`, errorResponse);
-                throw new Error(`HTTP error! Status: ${res.status}. Firebase response: ${errorResponse}`);
-            }
-            console.log(`[DEBUG] Successfully linked license '${licenseCode}' to device '${deviceId}'`);
-            return true;
-        } catch (e) {
-            console.error(`[ERROR] Exception when linking license '${licenseCode}' to device:`, e);
-            return false;
-        }
+        }).then(r => {
+            if (!r.ok) { throw new Error('Gagal menambahkan/memperbarui lisensi di node /licenses.'); }
+            _lU();
+        }).catch(e => { console.error("Error adding user or license:", e); console.log("❌ Gagal menambahkan pengguna atau lisensi: " + e.message); });
     }
 
-    async function verifyLicense() {
-        const licenseInput = document.getElementById("licenseInput");
-        const licenseMessage = document.getElementById("licenseMessage");
-        const attemptsLeftSpan = document.getElementById("attemptsLeft");
-        const appContainer = document.getElementById("appContainer");
-        const licenseOverlay = document.getElementById("licenseOverlay");
-
-        const licenseCode = licenseInput.value.trim();
-        const currentDeviceId = _get_device_id(); // Get or generate device ID
-
-        licenseMessage.classList.add("hidden"); // Hide previous message
-
-        if (!licenseCode) {
-            _display_message("licenseMessage", "Kode lisensi tidak boleh kosong.", "error", '<span class="icon">⚠️</span>');
-            return;
-        }
-
-        const { isValid, message, licenseInfo } = await _check_license_validity(licenseCode, currentDeviceId);
-
-        if (isValid) {
-            const isLinkedToOther = await _is_device_id_linked_to_other_active_license(currentDeviceId, licenseCode);
-            if (isLinkedToOther) {
-                _display_message("licenseMessage", 'Perangkat ini sudah terhubung dengan lisensi aktif lainnya. Hanya satu lisensi yang diizinkan per perangkat.', "error", '<span class="icon">❌</span>');
-                _attempts_left--;
-                attemptsLeftSpan.textContent = _attempts_left;
-            } else {
-                // This is the crucial part: if device_id is null or empty, link it.
-                if (licenseInfo.device_id === null || licenseInfo.device_id === "") {
-                    const linked = await _link_license_to_device(licenseCode, currentDeviceId);
-                    if (linked) {
-                        localStorage.setItem(_license_cache_key, licenseCode);
-                        _display_message("licenseMessage", `Lisensi valid! Selamat datang (ID Lisensi: ${licenseCode}).`, "success", '<span class="icon">✅</span>');
-                        setTimeout(() => {
-                            licenseOverlay.classList.add("hidden");
-                            appContainer.classList.remove("hidden");
-                            _init_app(); // Initialize main app
-                        }, 1000);
-                    } else {
-                        _display_message("licenseMessage", 'Gagal menghubungkan lisensi ke perangkat. Coba lagi.', "error", '<span class="icon">❌</span>');
-                        _attempts_left--;
-                        attemptsLeftSpan.textContent = _attempts_left;
-                    }
-                } else {
-                    // If device_id already exists and matches currentDeviceId, proceed
-                    localStorage.setItem(_license_cache_key, licenseCode);
-                    _display_message("licenseMessage", `Lisensi valid dan sudah terhubung ke perangkat ini. Selamat datang (ID Lisensi: ${licenseCode}).`, "success", '<span class="icon">✅</span>');
-                    setTimeout(() => {
-                        licenseOverlay.classList.add("hidden");
-                        appContainer.classList.remove("hidden");
-                        _init_app(); // Initialize main app
-                    }, 1000);
-                }
-            }
-        } else {
-            _display_message("licenseMessage", message, "error", '<span class="icon">❌</span>');
-            _attempts_left--;
-            attemptsLeftSpan.textContent = _attempts_left;
-        }
-
-        if (_attempts_left <= 0) {
-            licenseInput.disabled = true;
-            document.querySelector("#licenseOverlay button").disabled = true;
-            _display_message("licenseMessage", 'Anda telah mencapai batas percobaan. Program tidak dapat digunakan.', "error", '<span class="icon">⛔</span>');
-        }
+    function _lU() {
+        fetch(_u_db).then(r => r.json()).then(d => { _a = Object.entries(d || {}); _sU(); }).catch(e => { console.error("Error loading users:", e); console.log("❌ Gagal memuat daftar pengguna."); });
     }
 
-    async function _init_license_check() {
-        const cachedLicenseCode = localStorage.getItem(_license_cache_key);
-        const currentDeviceId = _get_device_id(); // Get or generate device ID
-        const licenseMessage = document.getElementById("licenseMessage");
-        const appContainer = document.getElementById("appContainer");
-        const licenseOverlay = document.getElementById("licenseOverlay");
-
-        // Ensure license overlay is visible by default
-        licenseOverlay.classList.remove("hidden"); // THIS LINE IS CRUCIAL FOR INITIAL DISPLAY
-
-        if (cachedLicenseCode) {
-            _display_message("licenseMessage", 'Mencoba memverifikasi lisensi dari cache...', "info", '<span class="icon">ℹ️</span>');
-
-            const { isValid, message, licenseInfo } = await _check_license_validity(cachedLicenseCode, currentDeviceId);
-
-            if (isValid) {
-                const isLinkedToOther = await _is_device_id_linked_to_other_active_license(currentDeviceId, cachedLicenseCode);
-                if (isLinkedToOther) {
-                    _display_message("licenseMessage", 'Perangkat ini sudah terhubung dengan lisensi aktif lainnya. Hanya satu lisensi yang diizinkan per perangkat.', "error", '<span class="icon">❌</span>');
-                    localStorage.removeItem(_license_cache_key); // Clear cache if invalid due to other license
-                    document.getElementById("attemptsLeft").textContent = _attempts_left; // Reset attempts for manual input
-                } else {
-                    _display_message("licenseMessage", `Lisensi perangkat valid! Selamat datang kembali (ID Lisensi: ${cachedLicenseCode}).`, "success", '<span class="icon">✅</span>');
-                    setTimeout(() => {
-                        licenseOverlay.classList.add("hidden");
-                        appContainer.classList.remove("hidden");
-                        _init_app();
-                    }, 1000);
-                    return; // Exit if valid
-                }
-            } else {
-                    _display_message("licenseMessage", `Lisensi cached tidak valid: ${message}. Silakan masukkan kode lisensi secara manual.`, "error", '<span class="icon">❌</span>');
-                    localStorage.removeItem(_license_cache_key); // Clear cache if invalid
-                    document.getElementById("attemptsLeft").textContent = _attempts_left; // Reset attempts for manual input
-            }
-        } else {
-            _display_message("licenseMessage", 'Tidak ada lisensi di cache lokal. Silakan masukkan kode lisensi.', "info", '<span class="icon">ℹ️</span>');
-        }
-        // If we reach here, either no cache or cached license was invalid, so show overlay
-        // This is already handled by removing "hidden" at the beginning of the function.
+    function _sU() {
+        const sT = document.getElementById("searchUser").value.toLowerCase();
+        _d = _a.filter(([uN, i]) => uN.toLowerCase().includes(sT) || (i.license_code || "").toLowerCase().includes(sT));
+        _c = 1; _rU();
     }
 
-    // --- Core Application Logic ---
-
-    function _normalize_month_input(userInputMonth) {
-        return _min[userInputMonth.trim().toLowerCase()] || null;
+    function _rU() {
+        const tB = document.getElementById("userBody"); const cB = document.getElementById("cardBody");
+        tB.innerHTML = ""; cB.innerHTML = "";
+        const s = (_c - 1) * _pp; const pU = _d.slice(s, s + _pp);
+        pU.forEach(([uN, i]) => {
+            const tR = document.createElement("tr");
+            // FIX: Menggunakan nama fungsi yang diekspos secara global untuk onclick
+            tR.innerHTML = `<td>${uN}</td><td>${i.license_code || "-"}</td><td>${i.active ? "✅ Aktif" : "⛔ Nonaktif"}</td><td><input type="text" class="flatpickr-input" value="${i.expire}" data-user="${uN}" readonly="readonly" /></td><td><button onclick="toggleStatus('${uN}', ${i.active})" style="background-color: ${i.active ? 'var(--primary-color)' : 'var(--accent-color)'};">${i.active ? "Nonaktifkan" : "Aktifkan"}</button><button onclick="hapusUser('${uN}', '${i.license_code || ''}')">🗑️</button><button onclick="resetDevice('${uN}', '${i.license_code || ''}')">🔁</button></td>`;
+            tB.appendChild(tR);
+            const c = document.createElement("div"); c.className = "user-card";
+            // FIX: Menggunakan nama fungsi yang diekspos secara global untuk onclick
+            c.innerHTML = `<div><strong>Nama Pengguna:</strong> <span>${uN}</span></div><div><strong>Kode Lisensi:</strong> <span>${i.license_code || "-"}</span></div><div><strong>Status:</strong> <span>${i.active ? "✅ Aktif" : "⛔ Nonaktif"}</span></div><div><strong>Expired:</strong> <input type="text" class="flatpickr-input" value="${i.expire}" data-user="${uN}" readonly="readonly" /></div><button onclick="toggleStatus('${uN}', ${i.active})" style="background-color: ${i.active ? 'var(--primary-color)' : 'var(--accent-color)'};">${i.active ? "Nonaktifkan" : "Aktifkan"}</button><button onclick="resetDevice('${uN}', '${i.license_code || ''}')">🔁 Reset Device</button><button onclick="hapusUser('${uN}', '${i.license_code || ''}')">🗑️ Hapus</button>`;
+            cB.appendChild(c);
+        });
+        document.getElementById("pageInfo").textContent = `Halaman ${_c} dari ${Math.ceil(_d.length / _pp)}`;
+        document.querySelector('.pagination button:first-child').disabled = _c === 1;
+        document.querySelector('.pagination button:last-child').disabled = _c === Math.ceil(_d.length / _pp);
+        _iFI();
     }
 
-    function _extract_month_from_filename(filename) {
-        const match = filename.match(/(\d{4})(\d{2})\d{2}(?:_\d{8})?/);
-        if (match) {
-            const monthNum = parseInt(match[2], 10);
-            if (monthNum >= 1 && monthNum <= 12) {
-                return _rmo[monthNum];
-            }
-        }
-        return null;
+    function _pP() { if (_c > 1) { _c--; _rU(); } }
+    function _nP() { if (_c < Math.ceil(_d.length / _pp)) { _c++; _rU(); } }
+
+    function _uUD(uN, f, v) {
+        fetch(`${_u_db.replace('.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv', '')}/${uN}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
+            method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [f]: v })
+        }).then(r => { if (!r.ok) { throw new Error('Gagal memperbarui data pengguna.'); } _lU(); }).catch(e => { console.error(`Error updating field ${f} for user ${uN}:`, e); console.log(`❌ Gagal memperbarui ${f} untuk pengguna ${uN}: ` + e.message); });
     }
 
-    function _display_message(elementId, msg, type, iconHtml = '') {
-        const el = document.getElementById(elementId);
-        if (el) {
-            el.innerHTML = `${iconHtml} ${msg}`;
-            el.className = `message ${type}`;
-            el.classList.remove("hidden");
-            // Clear message after 5 seconds unless it's a persistent error
-            if (type !== "error" || !msg.includes("tidak dapat digunakan")) {
-                setTimeout(() => { el.classList.add("hidden"); }, 5000);
-            }
-        }
+    function _uLD(lC, f, v) {
+        if (!lC) { console.warn("Kode lisensi tidak valid untuk pembaruan data lisensi."); return; }
+        fetch(`${_l_db}/${lC}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, {
+            method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [f]: v })
+        }).then(r => { if (!r.ok) { throw new Error('Gagal memperbarui data lisensi di node /licenses.'); } }).catch(e => { console.error(`Error updating field ${f} for license ${lC} in /licenses node:`, e); console.log(`❌ Gagal memperbarui ${f} untuk lisensi ${lC} di node /licenses: ` + e.message); });
     }
 
-    async function handleFileInput(type) {
-        const fileInput = document.getElementById(`${type}FileInput`);
-        const statusElementId = `${type}Status`;
-        const files = fileInput.files;
-
-        if (files.length === 0) {
-            _display_message(statusElementId, "Tidak ada file yang dipilih.", "error", '<span class="icon">⚠️</span>');
-            return;
-        }
-
-        _display_message(statusElementId, `<span class="processing-indicator">Memproses file...</span>`, "info", '<span class="icon">⏳</span>');
-        
-        let allFilesProcessed = true;
-        for (const file of files) {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-
-                    const detectedMonth = _extract_month_from_filename(file.name);
-                    let month = detectedMonth;
-
-                    if (!month) {
-                        // Using custom modal/prompt for better UX
-                        const userInput = await _custom_prompt(`Bulan tidak terdeteksi otomatis dari nama file: ${file.name}.\nMasukkan bulan (misal: Jan, Februari):`);
-                        month = _normalize_month_input(userInput);
-                        if (!month) {
-                            _display_message(statusElementId, `Bulan tidak valid untuk ${file.name}. File dilewati.`, "error", '<span class="icon">❌</span>');
-                            allFilesProcessed = false;
-                            return;
-                        }
-                    }
-
-                    if (type === 'penghasilan') {
-                        const summarySheet = workbook.Sheets['Summary'];
-                        const incomeSheet = workbook.Sheets['Income'];
-                        
-                        if (!summarySheet || !incomeSheet) {
-                            _display_message(statusElementId, `File Penghasilan '${file.name}' harus memiliki sheet 'Summary' dan 'Income'. Dilewati.`, "error", '<span class="icon">❌</span>');
-                            allFilesProcessed = false;
-                            return;
-                        }
-
-                        const dfSummary = XLSX.utils.sheet_to_json(summarySheet, { header: 1 });
-                        const dfIncomeRaw = XLSX.utils.sheet_to_json(incomeSheet, { header: 1 });
-                        
-                        // Find header row for Income sheet (row 6, 0-indexed)
-                        let incomeHeaderRow = 5; // Assuming header is at 6th row (index 5)
-                        if (dfIncomeRaw.length < incomeHeaderRow + 1) {
-                            _display_message(statusElementId, `Sheet 'Income' di '${file.name}' terlalu pendek. Dilewati.`, "error", '<span class="icon">❌</span>');
-                            allFilesProcessed = false;
-                            return;
-                        }
-                        const incomeHeaders = dfIncomeRaw[incomeHeaderRow];
-                        const dfIncomeData = dfIncomeRaw.slice(incomeHeaderRow + 1);
-
-                        const dfIncome = _create_dataframe(incomeHeaders, dfIncomeData);
-                        
-                        let incomeColName = null;
-                        const commonIncomeCols = ["total penghasilan", "total pendapatan", "penghasilan", "pendapatan", "jumlah pendapatan", "jumlah penghasilan", "total penjualan", "pendapatan bersih"];
-                        
-                        for (const col of dfIncome.columns) {
-                            if (commonIncomeCols.includes(col.toLowerCase().trim())) {
-                                // Check if column is mostly numeric
-                                const potentialNumericSeries = dfIncome.data.map(row => parseFloat(row[col]));
-                                const numericCount = potentialNumericSeries.filter(val => !isNaN(val)).length;
-                                if (numericCount / potentialNumericSeries.length >= 0.8) {
-                                    incomeColName = col;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!incomeColName) {
-                            const availableCols = dfIncome.columns.map((col, idx) => `${idx + 1}. ${col}`).join('\n');
-                            let userInputCol = await _custom_prompt(`Deteksi otomatis kolom 'Total Penghasilan' gagal di '${file.name}'.\nKolom yang tersedia:\n${availableCols}\nMasukkan NAMA KOLOM atau NOMOR KOLOM untuk 'Total Penghasilan':`);
-                            
-                            if (userInputCol) {
-                                const colIndex = parseInt(userInputCol, 10) - 1;
-                                if (!isNaN(colIndex) && colIndex >= 0 && colIndex < dfIncome.columns.length) {
-                                    incomeColName = dfIncome.columns[colIndex];
-                                } else if (dfIncome.columns.includes(userInputCol)) {
-                                    incomeColName = userInputCol;
-                                }
-                            }
-                        }
-
-                        if (incomeColName) {
-                            _data_penghasilan[month] = { Summary: dfSummary, Income: dfIncome, income_col_name: incomeColName };
-                            if (!_bulan_penghasilan.includes(month)) {
-                                _bulan_penghasilan.push(month);
-                                _bulan_penghasilan.sort((a, b) => _mo[a] - _mo[b]);
-                            }
-                            _display_message(statusElementId, `File Penghasilan '${file.name}' untuk bulan ${month} berhasil dimuat.`, "success", '<span class="icon">✅</span>');
-                        } else {
-                            _display_message(statusElementId, `Gagal menentukan kolom 'Total Penghasilan' untuk '${file.name}'. Dilewati.`, "error", '<span class="icon">❌</span>');
-                            allFilesProcessed = false;
-                        }
-
-                    } else if (type === 'order') {
-                        const firstSheetName = workbook.SheetNames[0]; // Changed to index 0 for first sheet
-                        const dfOrderRaw = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], { header: 1 });
-                        
-                        if (dfOrderRaw.length < 1) {
-                            _display_message(statusElementId, `File Order '${file.name}' kosong. Dilewati.`, "error", '<span class="icon">⚠️</span>');
-                            allFilesProcessed = false;
-                            return;
-                        }
-                        const orderHeaders = dfOrderRaw[0];
-                        const dfOrderData = dfOrderRaw.slice(1);
-                        const dfOrder = _create_dataframe(orderHeaders, dfOrderData);
-
-                        _data_order[month] = dfOrder;
-                        if (!_bulan_order.includes(month)) {
-                            _bulan_order.push(month);
-                            _bulan_order.sort((a, b) => _mo[a] - _mo[b]);
-                        }
-                        _display_message(statusElementId, `File Order '${file.name}' untuk bulan ${month} berhasil dimuat.`, "success", '<span class="icon">✅</span>');
-                    }
-                } catch (error) {
-                    _display_message(statusElementId, `Gagal memproses file '${file.name}': ${error.message}`, "error", '<span class="icon">❌</span>');
-                    allFilesProcessed = false;
-                } finally {
-                    _update_ui_state();
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        if (allFilesProcessed) {
-            _display_message(statusElementId, `Semua file ${type} berhasil diproses.`, "success", '<span class="icon">🎉</span>');
-        }
+    function _tS(uN, cS) {
+        if (!confirm(`Anda yakin ingin ${cS ? 'menonaktifkan' : 'mengaktifkan'} pengguna '${uN}'?`)) { return; }
+        const u = _a.find(([n, _]) => n === uN); if (!u) { console.error(`Pengguna '${uN}' tidak ditemukan.`); return; }
+        const lC = u[1].license_code;
+        _uUD(uN, 'active', !cS);
+        if (lC) { _uLD(lC, 'active', !cS); }
     }
 
-    // Custom prompt function to replace window.prompt for better UX
-    function _custom_prompt(message) {
-        return new Promise((resolve) => {
-            const modalId = 'customPromptModal';
-            let modal = document.getElementById(modalId);
-            if (!modal) {
-                modal = document.createElement('div');
-                modal.id = modalId;
-                modal.className = 'login-overlay'; // Reuse overlay style
-                modal.innerHTML = `
-                    <div class="login-box">
-                        <p id="customPromptMessage" class="text-lg mb-4 text-gray-700"></p>
-                        <input type="text" id="customPromptInput" class="w-full p-2 border rounded mb-4" />
-                        <button id="customPromptConfirm" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">OK</button>
-                        <button id="customPromptCancel" class="w-full bg-gray-300 text-gray-800 p-2 rounded mt-2 hover:bg-gray-400">Batal</button>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-            }
+    function _hU(uN, lC) {
+        if (!confirm(`Yakin ingin menghapus pengguna '${uN}' dan lisensi terkait '${lC}'?`)) return;
+        fetch(`${_u_db.replace('.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv', '')}/${uN}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, { method: "DELETE" })
+        .then(r => {
+            if (!r.ok) { throw new Error('Gagal menghapus pengguna dari Firebase.'); }
+            if (lC) {
+                return fetch(`${_l_db}/${lC}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, { method: "DELETE" });
+            } return Promise.resolve();
+        }).then(r => {
+            if (r && !r.ok) { throw new Error('Gagal menghapus lisensi terkait dari node /licenses.'); }
+            _lU();
+        }).catch(e => { console.error("Error deleting user or license:", e); console.log("❌ Gagal menghapus pengguna atau lisensi: " + e.message); });
+    }
 
-            document.getElementById('customPromptMessage').textContent = message;
-            const input = document.getElementById('customPromptInput');
-            input.value = ''; // Clear previous input
-            modal.classList.remove('hidden');
+    async function _rD(uN, oLC) {
+        if (!confirm(`Yakin ingin me-reset Device ID dan mengganti Kode Lisensi untuk pengguna '${uN}'? Ini akan memutuskan tautan lisensi dari perangkat saat ini dan menghasilkan kode baru.`)) return;
+        if (!oLC) { console.log(`Tidak ada kode lisensi yang terhubung dengan pengguna '${uN}'. Tidak ada Device ID yang bisa direset atau kode yang diganti.`); return; }
+        try {
+            let oLI = await fetch(`${_l_db}/${oLC}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`).then(r => { if (!r.ok) throw new Error('Gagal mengambil data lisensi lama.'); return r.json(); });
+            if (!oLI) { oLI = { active: true, expire: new Date().toISOString().split('T')[0] }; }
+            const nLC = _gALC();
+            await _uUD(uN, 'license_code', nLC);
+            const nLD = { active: oLI.active || true, expire: oLI.expire || new Date().toISOString().split('T')[0], device_id: null };
+            const nLF = await fetch(`${_l_db}/${nLC}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(nLD) });
+            if (!nLF.ok) { throw new Error('Gagal membuat entri lisensi baru di node /licenses.'); }
+            const dOLF = await fetch(`${_l_db}/${oLC}.json?auth=FAyQlzg5X01TscSU66SJ2VaSbB8i96eVK8qtOEWv`, { method: "DELETE" });
+            if (!dOLF.ok) { console.warn(`Gagal menghapus lisensi lama '${oLC}' dari node /licenses. Mungkin sudah dihapus atau tidak ada.`); }
+            _lU();
+        } catch (e) { console.error("Error saat mereset device dan mengganti kode lisensi:", e); console.log("❌ Gagal mereset device dan mengganti kode lisensi: " + e.message); }
+    }
 
-            const confirmBtn = document.getElementById('customPromptConfirm');
-            const cancelBtn = document.getElementById('customPromptCancel');
-
-            const cleanup = () => {
-                confirmBtn.onclick = null;
-                cancelBtn.onclick = null;
-                modal.classList.add('hidden');
-            };
-
-            confirmBtn.onclick = () => {
-                resolve(input.value);
-                cleanup();
-            };
-
-            cancelBtn.onclick = () => {
-                resolve(null); // Return null if cancelled
-                cleanup();
-            };
-
-            input.focus(); // Focus on the input field
+    function _iFI() {
+        flatpickr("#expire", { locale: "id", dateFormat: "Y-m-d", minDate: "today", enableTime: false, onChange: function(sD, dS, i) { if (i.element.id === "expire") { } } });
+        document.querySelectorAll('input.flatpickr-input[data-user]').forEach(i => {
+            flatpickr(i, { locale: "id", dateFormat: "Y-m-d", minDate: "today", enableTime: false, onChange: function(sD, dS, inst) {
+                const u = inst.element.dataset.user; if (u) { _uUD(u, 'expire', dS); }
+            } });
         });
     }
 
-    // Simple DataFrame-like object for basic operations
-    function _create_dataframe(headers, data) {
-        return {
-            columns: headers.map(h => String(h).trim()),
-            data: data.map(row => {
-                const obj = {};
-                headers.forEach((header, i) => {
-                    obj[String(header).trim()] = row[i];
-                });
-                return obj;
-            }),
-            // Basic method to get unique values for a column
-            get_unique_values(colName) {
-                const values = new Set();
-                this.data.forEach(row => {
-                    if (row[colName] !== undefined && row[colName] !== null) {
-                        values.add(String(row[colName]).trim());
-                    }
-                });
-                return Array.from(values);
-            },
-            // Basic method to filter data
-            filter(predicate) {
-                return this.data.filter(predicate);
-            },
-            // Basic method to sum a column
-            sum(colName) {
-                return this.data.reduce((acc, row) => {
-                    const val = parseFloat(row[colName]);
-                    return acc + (isNaN(val) ? 0 : val);
-                }, 0);
-            },
-            // Basic method to get unique count of a column
-            nunique(colName) {
-                const values = new Set();
-                this.data.forEach(row => {
-                    if (row[colName] !== undefined && row[colName] !== null) {
-                        values.add(String(row[colName]).trim());
-                    }
-                });
-                return values.size;
-            },
-            // Basic method to check if column exists
-            has_column(colName) {
-                return this.columns.includes(colName);
-            }
-        };
-    }
+    // Expose functions to global scope (window) for HTML onclick attributes
+    window.handleLogin = _hL;
+    window.logout = _l;
+    window.tambahUser = _tU;
+    window.searchUsers = _sU;
+    window.prevPage = _pP;
+    window.nextPage = _nP;
+    window.toggleStatus = _tS; // Exposed _tS as toggleStatus
+    window.hapusUser = _hU;     // Exposed _hU as hapusUser
+    window.resetDevice = _rD;   // Exposed _rD as resetDevice
+    // window.updateSessionActivityTime = _uSAT; // This function is called internally, no need to expose.
 
-    function _get_unique_products_from_all_orders() {
-        const allProductsData = new Set();
-        const requiredColumns = ["SKU Induk", "Nama Produk", "Nomor Referensi SKU", "Nama Variasi"];
-
-        for (const month in _data_order) {
-            const dfOrder = _data_order[month];
-            
-            const missingCols = requiredColumns.filter(col => !dfOrder.has_column(col));
-            if (missingCols.length > 0) {
-                console.warn(`Kolom identifikasi produk yang hilang di Dokumen Order bulan ${month}: ${missingCols.join(', ')}. Produk dari bulan ini mungkin tidak lengkap.`);
-                continue;
-            }
-
-            dfOrder.data.forEach(row => {
-                try {
-                    const skuInduk = String(row['SKU Induk'] || '').trim();
-                    const namaProduk = String(row['Nama Produk'] || '').trim();
-                    const refSku = String(row['Nomor Referensi SKU'] || '').trim();
-                    const variasi = String(row['Nama Variasi'] || '').trim();
-                    const key = `${skuInduk} | ${namaProduk} | ${refSku} | ${variasi}`;
-                    allProductsData.add(key);
-                } catch (e) {
-                    console.warn(`Peringatan: Gagal memproses baris produk unik: ${e}`);
-                }
-            });
-        }
-        return Array.from(allProductsData).sort();
-    }
-
-    function _get_eligible_months() {
-        const eligibleMonths = [];
-        const sortedPenghasilanMonths = [..._bulan_penghasilan].sort((a, b) => _mo[a] - _mo[b]);
-
-        for (const currentMonth of sortedPenghasilanMonths) {
-            if (!_data_penghasilan[currentMonth]) continue;
-            if (!_data_order[currentMonth] || _data_order[currentMonth].data.length === 0) continue;
-
-            const currentMonthNum = _mo[currentMonth];
-            // For January, check if December order data exists
-            if (currentMonthNum === 1) { 
-                if (_data_order['Des'] && _data_order['Des'].data.length > 0) {
-                    eligibleMonths.push(currentMonth);
-                }
-            } else { // For other months, check if previous month's order data exists
-                const prevMonthNum = currentMonthNum - 1;
-                const prevMonth = _rmo[prevMonthNum];
-                if (prevMonth && _data_order[prevMonth] && _data_order[prevMonth].data.length > 0) {
-                    eligibleMonths.push(currentMonth);
-                }
-            }
-        }
-        return eligibleMonths;
-    }
-
-    function _update_month_selects() {
-        const months = _get_eligible_months();
-        const analysisSelect = document.getElementById("analysisMonthSelect");
-        const iklanMonthSelect = document.getElementById("iklanInputMonth");
-        const operasionalMonthSelect = document.getElementById("operasionalInputMonth");
-
-        [analysisSelect, iklanMonthSelect, operasionalMonthSelect].forEach(select => {
-            select.innerHTML = '<option value="">Pilih Bulan</option>';
-            // Add all available months from penghasilan/order/iklan/operasional for input selects
-            const allAvailableMonths = new Set([..._bulan_penghasilan, ..._bulan_order, ..._bulan_iklan, ..._bulan_operasional]);
-            const sortedAllMonths = Array.from(allAvailableMonths).sort((a, b) => _mo[a] - _mo[b]);
-
-            const monthsToPopulate = (select.id === "analysisMonthSelect") ? months : sortedAllMonths;
-
-            monthsToPopulate.forEach(month => {
-                const option = document.createElement("option");
-                option.value = month;
-                option.textContent = _fmn[month];
-                select.appendChild(option);
-            });
-        });
-
-        // Enable/disable analysis buttons
-        const hasEnoughDataForAnalysis = months.length > 0;
-        document.getElementById("analyzeButton").disabled = !hasEnoughDataForAnalysis;
-        document.getElementById("summaryButton").disabled = !hasEnoughDataForAnalysis;
-        document.getElementById("exportButton").disabled = !hasEnoughDataForAnalysis;
-        document.getElementById("hppButton").disabled = (Object.keys(_data_order).length === 0);
-    }
-
-    function _update_ui_state() {
-        _update_month_selects();
-    }
-
-    async function inputBiaya(type) {
-        const monthSelect = document.getElementById(`${type}InputMonth`);
-        const amountInput = document.getElementById(`${type}InputAmount`);
-        const statusElementId = `${type}Status`;
-
-        const month = monthSelect.value;
-        const amount = parseFloat(amountInput.value);
-
-        if (!month) {
-            _display_message(statusElementId, "Pilih bulan terlebih dahulu.", "error", '<span class="icon">⚠️</span>');
-            return;
-        }
-        if (isNaN(amount) || amount < 0) {
-            _display_message(statusElementId, "Nominal tidak valid. Masukkan angka positif.", "error", '<span class="icon">❌</span>');
-            return;
-        }
-
-        if (type === 'iklan') {
-            _data_iklan[month] = amount;
-            if (!_bulan_iklan.includes(month)) {
-                _bulan_iklan.push(month);
-                _bulan_iklan.sort((a, b) => _mo[a] - _mo[b]);
-            }
-        } else if (type === 'operasional') {
-            _data_operasional[month] = amount;
-            if (!_bulan_operasional.includes(month)) {
-                _bulan_operasional.push(month);
-                _bulan_operasional.sort((a, b) => _mo[a] - _mo[b]);
-            }
-        }
-        _display_message(statusElementId, `Biaya ${type} untuk ${month} sebesar Rp ${amount.toLocaleString('id-ID')} berhasil disimpan.`, "success", '<span class="icon">✅</span>');
-        amountInput.value = '';
-        _update_ui_state();
-    }
-
-    async function inputHPPProduk() {
-        const hppStatus = document.getElementById("hppStatus");
-        if (Object.keys(_data_order).length === 0) {
-            _display_message(hppStatus, "Belum ada Dokumen Order yang diinput. Harap input Dokumen Order terlebih dahulu.", "error", '<span class="icon">⚠️</span>');
-            return;
-        }
-
-        const uniqueProducts = _get_unique_products_from_all_orders();
-        if (uniqueProducts.length === 0) {
-            _display_message(hppStatus, "Tidak ada produk unik yang ditemukan di Dokumen Order yang dimuat.", "info", '<span class="icon">ℹ️</span>');
-            return;
-        }
-
-        let allHPPEntered = true;
-        for (const productKey of uniqueProducts) {
-            const currentHPP = _data_hpp[productKey];
-            let promptText = `Masukkan HPP untuk produk:\n${productKey}`;
-            if (currentHPP !== undefined) {
-                promptText += ` (HPP saat ini: Rp ${currentHPP.toLocaleString('id-ID')})`;
-            }
-            
-            let hppInput = await _custom_prompt(promptText + "\n(atau kosongkan untuk lewati)");
-            if (hppInput === null) { // User cancelled
-                allHPPEntered = false;
-                break;
-            }
-            hppInput = hppInput.trim();
-
-            if (hppInput === "") {
-                console.log(`HPP untuk ${productKey} dilewati.`);
-                continue;
-            }
-
-            const hppValue = parseFloat(hppInput.replace(/[^0-9,-]+/g, "").replace(",", ".")); // Clean input
-            if (isNaN(hppValue) || hppValue < 0) {
-                _display_message(hppStatus, `Input HPP tidak valid untuk ${productKey}. Dilewati.`, "error", '<span class="icon">❌</span>');
-                allHPPEntered = false;
-                continue;
-            }
-            _data_hpp[productKey] = hppValue;
-        }
-
-        if (allHPPEntered) {
-            _display_message(hppStatus, "Input HPP produk selesai.", "success", '<span class="icon">✅</span>');
-        } else {
-            _display_message(hppStatus, "Beberapa input HPP dilewati atau tidak valid.", "info", '<span class="icon">ℹ️</span>');
-        }
-        _update_ui_state();
-    }
-
-    function resetAllData() {
-        if (confirm("Apakah Anda yakin ingin mereset semua data yang dimuat (penghasilan, order, biaya, HPP)? Tindakan ini tidak dapat dibatalkan.")) {
-            _data_penghasilan = {};
-            _data_order = {};
-            _data_iklan = {};
-            _data_operasional = {};
-            _data_hpp = {};
-            _bulan_penghasilan = [];
-            _bulan_order = [];
-            _bulan_iklan = [];
-            _bulan_operasional = [];
-            
-            document.getElementById("penghasilanFileInput").value = '';
-            document.getElementById("orderFileInput").value = '';
-            document.getElementById("iklanInputAmount").value = '';
-            document.getElementById("operasionalInputAmount").value = '';
-            document.getElementById("analysisOutput").classList.add("hidden");
-
-            _update_ui_state();
-            _display_message("analysisOutput", "Semua data berhasil direset.", "info", '<span class="icon">🔄</span>');
-        }
-    }
-
-    function _hitung_metrik(month) {
-        let totalPendapatanSummary = 0;
-        let biayaAdminLayanan = 0;
-        let totalPenghasilanIncome = 0;
-        let totalHPP = 0;
-        let biayaOperasional = _data_operasional[month] || 0;
-        let biayaIklan = _data_iklan[month] || 0;
-        let totalItemTerjualForBasketSize = 0;
-        let jumlahOrderUnikFromIncome = 0;
-
-        console.log(`--- Perhitungan Metrik untuk Bulan: ${month} ---`);
-
-        // Get data from _data_penghasilan
-        if (_data_penghasilan[month]) {
-            const dfSummary = _data_penghasilan[month].Summary;
-            const dfIncome = _data_penghasilan[month].Income;
-            const incomeColName = _data_penghasilan[month].income_col_name;
-
-            console.log("[DEBUG] Data Penghasilan (Summary):", dfSummary);
-            console.log("[DEBUG] Data Penghasilan (Income):", dfIncome);
-            console.log("[DEBUG] Kolom Penghasilan Terdeteksi:", incomeColName);
-
-            // Extract from Summary (assuming fixed cells for simplicity, adapt if needed)
-            try {
-                // For Summary sheet, assuming it's a simple 2D array from XLSX.utils.sheet_to_json(..., {header:1})
-                // D11 is row 10, col 3 (0-indexed)
-                totalPendapatanSummary = parseFloat(dfSummary[10]?.[3]) || 0;
-                console.log("[DEBUG] totalPendapatanSummary (dari D11):", totalPendapatanSummary);
-            } catch (e) {
-                console.warn(`Error reading D11 from Summary for ${month}: ${e.message}. Using 0.`);
-                totalPendapatanSummary = 0;
-            }
-            try {
-                // D22 is row 21, col 3 (0-indexed)
-                biayaAdminLayanan = parseFloat(dfSummary[21]?.[3]) || 0;
-                console.log("[DEBUG] biayaAdminLayanan (dari D22):", biayaAdminLayanan);
-            } catch (e) {
-                console.warn(`Error reading D22 from Summary for ${month}: ${e.message}. Using 0.`);
-                biayaAdminLayanan = 0;
-            }
-
-            // Extract from Income
-            if (incomeColName && dfIncome.has_column(incomeColName)) {
-                totalPenghasilanIncome = dfIncome.sum(incomeColName);
-                console.log("[DEBUG] totalPenghasilanIncome (sum dari kolom Income):", totalPenghasilanIncome);
-            } else {
-                console.warn(`Kolom '${incomeColName}' tidak ditemukan di sheet Income untuk ${month}. Menggunakan 0.`);
-                totalPenghasilanIncome = 0;
-            }
-
-            if (dfIncome.has_column(ORDER_ID_COL)) {
-                jumlahOrderUnikFromIncome = dfIncome.nunique(ORDER_ID_COL);
-                console.log("[DEBUG] jumlahOrderUnikFromIncome:", jumlahOrderUnikFromIncome);
-            } else {
-                console.warn(`Kolom '${ORDER_ID_COL}' tidak ditemukan di sheet Income untuk ${month}. Menggunakan 0 untuk order unik.`);
-                jumlahOrderUnikFromIncome = 0;
-            }
-        } else {
-            console.warn(`Data penghasilan tidak lengkap untuk bulan ${month}.`);
-        }
-
-        console.log("[DEBUG] Biaya Operasional Input:", biayaOperasional);
-        console.log("[DEBUG] Biaya Iklan Input:", biayaIklan);
-
-        // Calculate HPP based on orders and HPP data
-        const currentMonthOrderDf = _data_order[month];
-        if (currentMonthOrderDf && Object.keys(_data_hpp).length > 0) {
-            const relevantOrderData = currentMonthOrderDf.data; // Use all data from current month's order sheet
-            console.log("[DEBUG] Data Order untuk HPP:", relevantOrderData);
-            console.log("[DEBUG] Data HPP Produk:", _data_hpp);
-
-            for (const row of relevantOrderData) {
-                try {
-                    const skuInduk = String(row['SKU Induk'] || '').trim();
-                    const namaProduk = String(row['Nama Produk'] || '').trim();
-                    const refSku = String(row['Nomor Referensi SKU'] || '').trim();
-                    const variasi = String(row['Nama Variasi'] || '').trim();
-                    const productKey = `${skuInduk} | ${namaProduk} | ${refSku} | ${variasi}`;
-                    const quantity = parseFloat(row[QUANTITY_COL]);
-
-                    if (!isNaN(quantity) && quantity > 0) {
-                        totalItemTerjualForBasketSize += quantity;
-                        const hppProduk = _data_hpp[productKey];
-                        if (hppProduk !== undefined) {
-                            totalHPP += (hppProduk * quantity);
-                            console.log(`[DEBUG] HPP untuk ${productKey} (Qty: ${quantity}, HPP/unit: ${hppProduk}) = ${hppProduk * quantity}. Total HPP saat ini: ${totalHPP}`);
-                        } else {
-                            console.warn(`HPP tidak ditemukan untuk produk: '${productKey}'. Dianggap 0 untuk item ini.`);
-                        }
-                    }
-                } catch (e) {
-                    console.warn(`Error processing order row for HPP calculation: ${e.message}`, row);
-                }
-            }
-            console.log("[DEBUG] Total HPP Terhitung:", totalHPP);
-            console.log("[DEBUG] Total Item Terjual (untuk Basket Size):", totalItemTerjualForBasketSize);
-        } else {
-            console.warn(`Data order atau HPP tidak lengkap untuk perhitungan HPP bulan ${month}.`);
-        }
-
-        const labaKotor = totalPendapatanSummary - totalHPP;
-        const labaBersih = totalPenghasilanIncome - totalHPP - biayaOperasional - biayaIklan;
-
-        console.log("[DEBUG] Laba Kotor:", labaKotor);
-        console.log("[DEBUG] Laba Bersih:", labaBersih);
-
-        const rasioAdminLayanan = (totalPendapatanSummary > 0) ? (Math.abs(biayaAdminLayanan) / totalPendapatanSummary) * 100 : 0;
-        const rasioOperasional = (totalPendapatanSummary > 0) ? ((biayaOperasional + biayaIklan) / totalPendapatanSummary) * 100 : 0;
-        const aovAktual = (jumlahOrderUnikFromIncome > 0) ? totalPenghasilanIncome / jumlahOrderUnikFromIncome : 0;
-        const basketSizeAktual = (jumlahOrderUnikFromIncome > 0) ? totalItemTerjualForBasketSize / jumlahOrderUnikFromIncome : 0;
-        const roasAktual = (biayaIklan > 0) ? totalPendapatanSummary / biayaIklan : 0;
-        const acosAktual = (totalPendapatanSummary > 0) ? (biayaIklan / totalPendapatanSummary) * 100 : 0;
-        const rasioMargin = (totalPendapatanSummary > 0) ? (labaKotor / totalPendapatanSummary) * 100 : 0;
-        const rasioLaba = (totalPendapatanSummary > 0) ? (labaBersih / totalPendapatanSummary) * 100 : 0;
-
-        console.log("[DEBUG] Rasio Admin & Layanan:", rasioAdminLayanan);
-        console.log("[DEBUG] Rasio Operasional:", rasioOperasional);
-        console.log("[DEBUG] AOV Aktual:", aovAktual);
-        console.log("[DEBUG] Basket Size Aktual:", basketSizeAktual);
-        console.log("[DEBUG] ROAS Aktual:", roasAktual);
-        console.log("[DEBUG] ACOS Aktual:", acosAktual);
-        console.log("[DEBUG] Rasio Margin:", rasioMargin);
-        console.log("[DEBUG] Rasio Laba:", rasioLaba);
-        console.log("[DEBUG] Status Laba:", labaBersih >= 0 ? "LABA" : "RUGI");
-        console.log("--- Akhir Perhitungan Metrik ---");
-
-
-        return {
-            "TOTAL PENDAPATAN (SUMMARY)": totalPendapatanSummary,
-            "TOTAL PENGHASILAN (INCOME)": totalPenghasilanIncome,
-            "HPP": totalHPP,
-            "BIAYA OPERASIONAL": biayaOperasional,
-            "BIAYA IKLAN": biayaIklan,
-            "LABA KOTOR": labaKotor,
-            "LABA BERSIH": labaBersih,
-            "RASIO ADMIN & LAYANAN": rasioAdminLayanan,
-            "RASIO OPERASIONAL": rasioOperasional,
-            "AOV AKTUAL": aovAktual,
-            "BASKET SIZE AKTUAL": basketSizeAktual,
-            "ROAS AKTUAL": roasAktual,
-            "ACOS AKTUAL": acosAktual,
-            "RASIO MARGIN": rasioMargin,
-            "RASIO LABA": rasioLaba,
-            "STATUS LABA": labaBersih >= 0 ? "LABA" : "RUGI"
-        };
-    }
-
-    function displaySingleMonthAnalysis() {
-        const month = document.getElementById("analysisMonthSelect").value;
-        const outputDiv = document.getElementById("analysisOutput");
-        outputDiv.classList.add("hidden"); // Hide previous output
-
-        if (!month) {
-            _display_message("analysisOutput", "Pilih bulan untuk analisis.", "error", '<span class="icon">⚠️</span>');
-            return;
-        }
-
-        const results = _hitung_metrik(month);
-        const fullMonthName = _fmn[month];
-
-        let html = `
-            <h3 class="text-xl font-semibold text-center text-gray-700 mb-4">Analisis Keuangan Bulan ${fullMonthName}</h3>
-            <table class="min-w-full bg-white">
-                <thead>
-                    <tr>
-                        <th class="py-2 px-4">Metrik</th>
-                        <th class="py-2 px-4">Nilai</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        for (const key in results) {
-            let value = results[key];
-            let formattedValue = value;
-            let rowClass = '';
-            let icon = '';
-
-            if (typeof value === 'number') {
-                if (key.includes("PERSEN") || key.includes("%") || key.includes("RASIO") || key.includes("ACOS") || key.includes("MARGIN") || key.includes("LABA")) {
-                    formattedValue = `${value.toFixed(2)}%`;
-                } else if (key.includes("ROAS")) {
-                    formattedValue = `${value.toFixed(2)}x`;
-                } else if (key.includes("BASKET SIZE")) {
-                    formattedValue = `${value.toFixed(2)} item/order`;
-                } else {
-                    formattedValue = `Rp ${value.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-                }
-            } else if (key === "STATUS LABA") {
-                formattedValue = value;
-                if (value === "LABA") {
-                    rowClass = 'text-green-600 font-bold';
-                    icon = '✅';
-                } else {
-                    rowClass = 'text-red-600 font-bold';
-                    icon = '⛔';
-                }
-            }
-
-            html += `
-                <tr class="${rowClass}">
-                    <td class="py-2 px-4">${_scm[key] || key}</td>
-                    <td class="py-2 px-4">${icon} ${formattedValue}</td>
-                </tr>
-            `;
-        }
-
-        html += `
-                </tbody>
-            </table>
-        `;
-        outputDiv.innerHTML = html;
-        outputDiv.classList.remove("hidden");
-    }
-
-    function displayAllMonthsSummary() {
-        const outputDiv = document.getElementById("analysisOutput");
-        outputDiv.classList.add("hidden"); // Hide previous output
-
-        const eligibleMonths = _get_eligible_months();
-        if (eligibleMonths.length === 0) {
-            _display_message("analysisOutput", "Belum ada bulan yang memenuhi syarat untuk dianalisis.", "error", '<span class="icon">⚠️</span>');
-            return;
-        }
-
-        const allMonthsData = [];
-        for (const month of eligibleMonths) {
-            const metrics = _hitung_metrik(month);
-            metrics['Bulan'] = _fmn[month]; // Add full month name for display
-            allMonthsData.push(metrics);
-        }
-
-        if (allMonthsData.length === 0) {
-            _display_message("analysisOutput", "Tidak ada data yang tersedia untuk ditampilkan dalam tabel ringkasan.", "info", '<span class="icon">ℹ️</span>');
-            return;
-        }
-
-        // Prepare columns and headers
-        const columns = [
-            "Bulan", "TOTAL PENDAPATAN (SUMMARY)", "TOTAL PENGHASILAN (INCOME)", "HPP",
-            "BIAYA OPERASIONAL", "BIAYA IKLAN", "LABA KOTOR", "LABA BERSIH",
-            "RASIO ADMIN & LAYANAN", "RASIO OPERASIONAL", "AOV AKTUAL", "BASKET SIZE AKTUAL",
-            "ROAS AKTUAL", "ACOS AKTUAL", "RASIO MARGIN", "RASIO LABA", "STATUS LABA"
-        ];
-        
-        let html = `
-            <h3 class="text-xl font-semibold text-center text-gray-700 mb-4">Ringkasan Analisis Keuangan Semua Bulan</h3>
-            <table class="min-w-full bg-white">
-                <thead>
-                    <tr>
-        `;
-        for (const col of columns) {
-            html += `<th class="py-2 px-4">${_scm[col] || col}</th>`;
-        }
-        html += `
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        for (const rowData of allMonthsData) {
-            html += '<tr>';
-            for (const col of columns) {
-                let value = rowData[col];
-                let formattedValue = value;
-                let cellClass = '';
-                let icon = '';
-
-                if (typeof value === 'number') {
-                    if (col.includes("PERSEN") || col.includes("%") || col.includes("RASIO") || col.includes("ACOS") || col.includes("MARGIN") || col.includes("LABA")) {
-                        formattedValue = `${value.toFixed(2)}%`;
-                    } else if (col.includes("ROAS")) {
-                        formattedValue = `${value.toFixed(2)}x`;
-                    } else if (col.includes("BASKET SIZE")) {
-                        formattedValue = `${value.toFixed(2)}`;
-                    } else {
-                        formattedValue = `Rp ${value.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-                    }
-                } else if (col === "STATUS LABA") {
-                    formattedValue = value;
-                    if (value === "LABA") {
-                        cellClass = 'text-green-600 font-bold';
-                        icon = '✅';
-                    } else {
-                        cellClass = 'text-red-600 font-bold';
-                        icon = '⛔';
-                    }
-                }
-
-                html += `<td class="py-2 px-4 ${cellClass}">${icon} ${formattedValue}</td>`;
-            }
-            html += '</tr>';
-        }
-
-        html += `
-                </tbody>
-            </table>
-        `;
-        outputDiv.innerHTML = html;
-        outputDiv.classList.remove("hidden");
-    }
-
-    async function exportReports() {
-        const eligibleMonths = _get_eligible_months();
-        if (eligibleMonths.length === 0) {
-            _display_message("analysisOutput", "Belum ada bulan yang memenuhi syarat untuk diekspor.", "error", '<span class="icon">⚠️</span>');
-            return;
-        }
-
-        const exportChoice = await _custom_prompt("Pilih jenis ekspor:\n1. Ekspor Laporan Bulan Spesifik\n2. Ekspor Laporan Semua Bulan ke Satu File\n(Masukkan 1 atau 2)");
-
-        if (exportChoice === '1') {
-            const monthNames = eligibleMonths.map(m => _fmn[m]).join(', ');
-            const monthToExportInput = await _custom_prompt(`Bulan yang tersedia: ${monthNames}\nMasukkan bulan yang ingin diekspor (misal: Jan, Februari):`);
-            const normalizedMonth = _normalize_month_input(monthToExportInput);
-
-            if (normalizedMonth && eligibleMonths.includes(normalizedMonth)) {
-                const singleMonthAnalysisData = _hitung_metrik(normalizedMonth);
-                _export_to_excel(singleMonthAnalysisData, "single", normalizedMonth);
-            } else {
-                _display_message("analysisOutput", "Bulan tidak valid atau tidak tersedia untuk analisis.", "error", '<span class="icon">❌</span>');
-            }
-        } else if (exportChoice === '2') {
-            const allMonthsAnalysisData = {};
-            for (const month of eligibleMonths) {
-                allMonthsAnalysisData[month] = _hitung_metrik(month);
-            }
-            _export_to_excel(allMonthsAnalysisData, "all");
-        } else {
-            _display_message("analysisOutput", "Pilihan tidak valid.", "error", '<span class="icon">❌</span>');
-        }
-    }
-
-    function _export_to_excel(data, exportType, monthName = null) {
-        const wb = XLSX.utils.book_new();
-        let ws;
-        let fileName = "Laporan_Keuangan";
-
-        if (exportType === "single") {
-            const fullMonthName = _fmn[monthName];
-            fileName = `Laporan_Keuangan_${fullMonthName}.xlsx`;
-            const rows = Object.keys(data).map(key => [_scm[key] || key, data[key]]);
-            ws = XLSX.utils.aoa_to_sheet([["Metrik", "Nilai"], ...rows]);
-        } else if (exportType === "all") {
-            fileName = "Laporan_Keuangan_Semua_Bulan.xlsx";
-            const allDataForDf = [];
-            const sortedMonths = Object.keys(data).sort((a, b) => _mo[a] - _mo[b]);
-            for (const month of sortedMonths) {
-                const metrics = data[month];
-                const rowData = {};
-                for (const key in metrics) {
-                    rowData[_scm[key] || key] = metrics[key];
-                }
-                rowData["Bulan"] = _fmn[month];
-                allDataForDf.push(rowData);
-            }
-            // Ensure consistent column order for all months
-            const columns = [
-                "Bulan", "PENDAPATAN", "PENGHASILAN", "HPP", "OPERASIONAL", "IKLAN",
-                "LABA KOTOR", "LABA BERSIH", "ADM & LYN %", "OPS %", "AOV", "BASKET SIZE",
-                "ROAS", "ACOS", "MARGIN %", "LABA %", "STATUS"
-            ];
-            ws = XLSX.utils.json_to_sheet(allDataForDf, { header: columns });
-        }
-
-        XLSX.utils.book_append_sheet(wb, ws, monthName ? _fmn[monthName] : "Ringkasan");
-        XLSX.writeFile(wb, fileName);
-        _display_message("analysisOutput", `Laporan berhasil diekspor sebagai ${fileName}`, "success", '<span class="icon">✅</span>');
-    }
-
-    // --- Initialization ---
-    function _init_app() {
-        _update_ui_state();
-    }
-
-    // Initial license check on page load
-    window.onload = _init_license_check;
-
-    // Expose global functions for HTML onclick
-    window.handleFileInput = handleFileInput;
-    window.inputBiaya = inputBiaya;
-    window.inputHPPProduk = inputHPPProduk;
-    window.displaySingleMonthAnalysis = displaySingleMonthAnalysis;
-    window.displayAllMonthsSummary = displayAllMonthsSummary;
-    window.exportReports = exportReports;
-    window.verifyLicense = verifyLicense; // Expose verifyLicense for the button
-    window.resetAllData = resetAllData; // Expose reset function
 })();
     </script>
 </body>
