@@ -301,8 +301,8 @@
             hitungPotensiKeuntungan();
             hitungPersenTargetLabaBersih();
             hitungBudgetIklan();
-            hitungTargetROAS();
-            hitungRugiROAS();
+            hitungTargetROAS(); // Pastikan ini dipanggil
+            hitungRugiROAS();   // Pastikan ini dipanggil setelah hitungBudgetIklan
             hitungRekomendasiROAS();
         }
 
@@ -326,7 +326,7 @@
                     el.classList.toggle('disabled-bg', mode !== "otomatis");
                 }
             });
-            hitungSemua();
+            // hitungSemua(); // Panggilan ini akan dipindahkan ke event listener adminMode
         }
 
         function updateKategoriProduk() {
@@ -335,7 +335,7 @@
             const kategoriOptions = {
                 nonstar: ["A", "B", "C", "D", "E"],
                 star: ["A", "B", "C", "D", "E"],
-                mall: ["A", "B", "C", "D", "E", "F"]
+                mall: ["A", "B", "C", "D", "E", "F", "G"]
             };
 
             kategoriSelect.innerHTML = '<option value="">Pilih Kategori</option>';
@@ -354,6 +354,7 @@
             const mode = document.getElementById("adminMode").value;
             const hiddenInput = document.getElementById("adminTotal");
             let totalAdmin = 0;
+            const hargaJual = parseRupiah(document.getElementById("hargaJual").value);
 
             if (mode === "manual") {
                 const manualVal = parseFloat(document.getElementById("adminManual").value);
@@ -361,7 +362,6 @@
             } else if (mode === "otomatis") {
                 const jenisToko = document.getElementById("jenisToko").value;
                 const kategori = document.getElementById("kategoriProduk").value;
-                const hargaJual = parseRupiah(document.getElementById("hargaJual").value);
 
                 if (!jenisToko || !kategori || !biayaAdminTable[jenisToko]?.[kategori] || hargaJual === 0) {
                     hiddenInput.value = "";
@@ -371,31 +371,54 @@
 
                 let baseAdmin = biayaAdminTable[jenisToko][kategori];
 
+                // Biaya layanan program
                 if (document.getElementById("useGratisOngkir").checked) {
-                    const nominalFee = hargaJual * 0.04;
-                    const cappedFee = Math.min(nominalFee, 20000);
-                    baseAdmin += (cappedFee / hargaJual) * 100;
+                    const nominalFee = hargaJual * 0.055;
+                    const cappedFee = Math.min(nominalFee, 20000); // Max Rp 20.000
+                    baseAdmin += (cappedFee / hargaJual) * 100; // Ubah ke persentase
+                }
+                
+                if (document.getElementById("useCashback").checked) {
+                    const nominalFee = hargaJual * 0.014; // 1.4% dari harga jual
+                    const cappedFee = Math.min(nominalFee, 20000); // Max Rp 20.000
+                    baseAdmin += (cappedFee / hargaJual) * 100; // Ubah ke persentase
+                }
+                
+                if (document.getElementById("usePromo").checked) {
+                     const nominalFee = hargaJual * 0.02; // 2% dari harga jual
+                     const cappedFee = Math.min(nominalFee, 20000); // Max Rp 10.000 (contoh batas)
+                     baseAdmin += (cappedFee / hargaJual) * 100; // Ubah ke persentase
                 }
 
-                if (document.getElementById("useCashback").checked) baseAdmin += 1.40;
-                if (document.getElementById("usePromo").checked) baseAdmin += 2.00;
+                totalAdmin = baseAdmin; 
 
-                totalAdmin = baseAdmin;
+
+            } else { // Jika "Pilih Mode"
+                totalAdmin = 0; // Reset total admin jika tidak ada mode yang dipilih
             }
 
             hiddenInput.value = totalAdmin.toFixed(2);
-            hitungSemua();
+            hitungSemua(); // Panggil hitungSemua setiap kali total admin berubah
         }
 
         function updateMarginProfit() {
             const hargaJual = parseRupiah(document.getElementById('hargaJual').value);
             const hpp = parseRupiah(document.getElementById('hpp').value);
             const operasional = parseRupiah(document.getElementById('operasional').value);
-            const hppReal = hpp + operasional + 1250;
+            const admin = parseFloat(document.getElementById("adminTotal").value) || 0; // Ambil nilai admin yang sudah dihitung
+            const voucher = parseRupiah(document.getElementById("voucherMax").value);
+
+            // Biaya proses pesanan yang tetap (Rp 1.250)
+            const biayaProsesPesanan = 1250; 
+            
+            // Hitung HPP realistik (modal + operasional + biaya proses + admin nominal)
+            const adminNominal = hargaJual * admin / 100; // Konversi persentase admin ke nominal
+            const hppEfektif = hpp + biayaProsesPesanan + adminNominal + operasional;
+            
             const marginInput = document.getElementById('marginProfit');
 
             if (hargaJual > 0) {
-                const margin = ((hargaJual - hppReal) / hargaJual) * 100;
+                const margin = ((hargaJual - hppEfektif) / hargaJual) * 100;
                 marginInput.value = margin.toFixed(2);
             } else {
                 marginInput.value = '';
@@ -405,18 +428,21 @@
         function hitungHPPReal() {
             const hpp = parseRupiah(document.getElementById("hpp").value);
             const operasional = parseRupiah(document.getElementById("operasional").value);
-            const hppReal = hpp + operasional + 1250;
+            const biayaProsesPesanan = 1250; // Biaya proses pesanan
+            const hppReal = hpp + operasional + biayaProsesPesanan;
             document.getElementById("HPPReal").value = formatRupiah(hppReal);
         }
 
         function hitungPotensiKeuntungan() {
             const hargaJual = parseRupiah(document.getElementById("hargaJual").value);
-            const hppReal = parseRupiah(document.getElementById("HPPReal").value);
+            const hpp = parseRupiah(document.getElementById("hpp").value);
+            const operasional = parseRupiah(document.getElementById("operasional").value);
             const admin = parseFloat(document.getElementById("adminTotal").value) || 0;
             const voucher = parseRupiah(document.getElementById("voucherMax").value);
+            const biayaProsesPesanan = 1250;
 
             const adminNominal = hargaJual * admin / 100;
-            const keuntungan = hargaJual - hppReal - adminNominal - voucher;
+            const keuntungan = hargaJual - hpp - operasional - adminNominal - voucher - biayaProsesPesanan;
 
             document.getElementById("potensiKeuntungan").value = formatRupiah(keuntungan);
 
@@ -433,9 +459,8 @@
 
             let persenBudget = 0;
             if (hargaJual > 0) {
-                const persenPotensiKeuntungan = (potensiKeuntungan / hargaJual) * 100;
-                const persenTargetLabaBersih = (targetLabaBersih / hargaJual) * 100;
-                persenBudget = persenPotensiKeuntungan - persenTargetLabaBersih;
+                // Ini adalah persentase dari harga jual yang bisa dialokasikan untuk iklan
+                persenBudget = (nominalBudget / hargaJual) * 100;
             }
 
             document.getElementById("nominalBudgetIklan").textContent = formatRupiah(nominalBudget);
@@ -457,11 +482,11 @@
 
         function hitungTargetROAS() {
             const persenStr = document.getElementById("budgetIklanPersen").value;
-            const persen = parseFloat(persenStr.replace('%', '').replace(',', '.')) || 0;
+            const persenBudgetIklan = parseFloat(persenStr.replace('%', '').replace(',', '.')) || 0;
 
             let target = 0;
-            if (persen > 0) {
-                target = 100 / persen;
+            if (persenBudgetIklan > 0) {
+                target = 100 / persenBudgetIklan;
             }
 
             document.getElementById("targetRoas").value = target.toFixed(2);
@@ -469,16 +494,18 @@
 
         function hitungRugiROAS() {
             const hargaJual = parseRupiah(document.getElementById("hargaJual").value);
-            const potensiKeuntungan = parseRupiah(document.getElementById("potensiKeuntungan").value);
-            const persenBudgetText = document.getElementById("budgetIklanPersen").value;
-            const persenBudget = parseFloat(persenBudgetText.replace('%', '').replace(',', '.')) / 100;
+            const potensiKeuntungan = parseRupiah(document.getElementById("potensiKeuntungan").value); // Ini laba kotor
+            const persenStr = document.getElementById("budgetIklanPersen").value;
+            const persenBudgetIklan = parseFloat(persenStr.replace('%', '').replace(',', '.')) || 0;
 
+            // Rumus: HARGA JUAL / ( POTENSI KEUNTUNGAN - ( potensi keuntungan * budget iklan format persen))
+            let denominator = potensiKeuntungan - (potensiKeuntungan * (persenBudgetIklan / 100));
             let rugiRoas = 0;
-            const nominalBudgetIklan = potensiKeuntungan * persenBudget;
-            const sisaKeuntungan = potensiKeuntungan - nominalBudgetIklan;
 
-            if (sisaKeuntungan > 0) {
-                rugiRoas = hargaJual / sisaKeuntungan;
+            if (denominator > 0) {
+                rugiRoas = hargaJual / denominator;
+            } else if (denominator <= 0 && hargaJual > 0) {
+                 rugiRoas = Infinity; // Atau nilai yang sangat besar jika penyebut 0 atau negatif
             }
 
             document.getElementById("rugiRoas").value = rugiRoas.toFixed(2);
@@ -499,9 +526,9 @@
 
         // --- Event Listener Utama ---
         document.addEventListener('DOMContentLoaded', () => {
-            const inputFields = ['hpp', 'hargaJual', 'voucherMax', 'operasional', 'adminManual', 'TargetLabaBersih'];
+            const inputFieldsRupiah = ['hpp', 'hargaJual', 'voucherMax', 'operasional', 'TargetLabaBersih'];
 
-            inputFields.forEach(id => {
+            inputFieldsRupiah.forEach(id => {
                 const input = document.getElementById(id);
                 if (input) {
                     input.addEventListener('focus', () => input.select());
@@ -509,15 +536,24 @@
                         applyRupiahFormat(input);
                         hitungSemua();
                     });
-                    // Tambahkan event 'input' untuk memicu perhitungan secara real-time
-                    input.addEventListener('input', () => {
-                        hitungSemua();
-                    });
+                    // Event 'input' untuk input Rupiah (optional, jika ingin real-time tapi tanpa format Rupiah saat mengetik)
+                    // input.addEventListener('input', hitungSemua); 
                 }
             });
 
+            // Event listener khusus untuk adminManual
+            const adminManualInput = document.getElementById('adminManual');
+            if (adminManualInput) {
+                adminManualInput.addEventListener('focus', () => adminManualInput.select());
+                adminManualInput.addEventListener('blur', hitungTotalAdmin); // Panggil hitungTotalAdmin saat blur
+                adminManualInput.addEventListener('input', hitungTotalAdmin); // Panggil hitungTotalAdmin secara real-time saat input manual
+            }
+
             // Event listeners untuk elemen select dan checkbox
-            document.getElementById("adminMode").addEventListener('change', hitungTotalAdmin);
+            document.getElementById("adminMode").addEventListener('change', () => {
+                toggleAdminMode();
+                hitungTotalAdmin(); // Pastikan dihitung ulang setelah mode berubah
+            });
             document.getElementById("jenisToko").addEventListener('change', updateKategoriProduk);
             document.getElementById("kategoriProduk").addEventListener('change', hitungTotalAdmin);
             document.getElementById("useGratisOngkir").addEventListener('change', hitungTotalAdmin);
@@ -526,9 +562,10 @@
 
             // Panggil fungsi inisialisasi saat halaman dimuat
             toggleAdminMode();
+            hitungSemua(); // Panggil hitungSemua sekali saat DOMContentLoaded untuk inisialisasi awal
         });
         
-        
+        // Tab navigation for input fields
         const focusableElements = Array.from(document.querySelectorAll('input, select'))
             .filter(el => !el.readOnly && !el.disabled && el.type !== 'hidden');
 
@@ -536,14 +573,12 @@
             el.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
+                hitungSemua();
                 const next = focusableElements[index + 1];
                 if (next) next.focus();
             }
             });
         });
-        </script>
-
     </script>
 </body>
-
 </html>
